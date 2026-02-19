@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Connie Zhang | Portfolio</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+      <h1 class="title">Connie Zhang</h1>
+      <p class="subtitle">Computer Science + Economics @ UIUC</p>
+
+      <div class="links">
+        <a href="https://github.com/connie4-beep" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://www.linkedin.com/in/connie-z-51727529a/" target="_blank" rel="noopener noreferrer">LinkedIn</a>
+        <a href="mailto:connie4@illinois.edu">Email</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="section">
+      <h2>About Me</h2>
+      <p>
+        Hi! I'm Connie, majoring in Computer Science and Economics.
+        I'm passionate about data analysis, UI/UX Design and building software tools that
+        connect finance and technology.
+      </p>
+      <p>
+        I have experience in research, tutoring, multimedia production, and programming in Python, Java, C++, and R.
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>Projects</h2>
+
+      <div class="project-card">
+        <h3>Market Tracker & AI Analyst Dashboard</h3>
+        <p class="project-desc">
+          A stock dashboard built with Python (Dash + Plotly + yfinance) that displays candlestick charts
+          and includes an AI assistant powered by Gemini to answer market-related questions.
+        </p>
+        <div align="center">
+            <img src="demo.png" alt="Stock Dashboard Demo" style="max-width: 100%; height: auto;">
+        </div>
+        <ul class="project-list">
+          <li>Sector-based asset selection (Tech, Healthcare, Finance, etc.)</li>
+          <li>Timeframe-based candlestick charts</li>
+          <li>AI assistant that summarizes company info and news</li>
+          <li>Real-time interactive UI using Dash callbacks</li>
+        </ul>
+
+        <div class="project-links">
+          <a class="btn" href="https://github.com/connie4-beep/stock_dashboard" target="_blank" rel="noopener noreferrer">
+            View Code
+          </a>
+
+          <button class="btn secondary" onclick="toggleDetails('market-details')">
+            Show Details
+          </button>
+        </div>
+
+        <div id="market-details" class="hidden details-box">
+          <p><strong>Tech Stack:</strong> Python, Dash, Plotly, yfinance, Gemini API</p>
+          <p><strong>Skills:</strong> Data visualization, API integration, UI/UX design, caching, prompt engineering</p>
+          <p><strong>How to Run:</strong></p>
+          <pre>
+            1. Download the Code: They need to pull your code onto their local machine first.
+                git clone https://github.com/connie4-beep/stock_dashboard.git
+                cd stock_dashboard
+            2. Create a Virtual Environment: They shouldn't install your packages directly into their system's main Python setup. They need to create an isolated environment so your dependencies don't conflict with their other projects.
+                python -m venv venv
+
+            3. Activate the Environment: They must "turn on" the environment.
+                Mac/Linux: source venv/bin/activate
+                Windows: venv\Scripts\activate
+
+            4. Install the Requirements: Now they can safely run your installation command inside their isolated environment.
+                pip install -r requirements.txt
+
+            5. Set up the Environment Variables: Because you smartly excluded your .env file using .gitignore, it won't be in the repository they download. You need to instruct them to create their own .env file in the main folder and add their own GEMINI_API_KEY="your_api_key_here".
+
+            6. Run the App: Finally, they can launch the dashboard.
+                python app.py
+          </pre>
+        </div>
+      </div>
+
+        <div class="project-card">
+        <h3>Project: Implemented a hybrid image pipeline</h3>
+        <p class="project-desc">
+          Implemented a hybrid image pipeline for CS445: Computational Photography to explore image frequency representations and enhancement techniques. 
+          Created hybrid images by combining the high-frequency component of one image with the low-frequency component of another, 
+          producing images that change perception based on viewing distance. Applied frequency analysis using Fourier transforms to visualize input, 
+          filtered, and hybrid images. Extended the project with image enhancement tasks including contrast adjustment, color enhancement, and color shifts, 
+          using Python and OpenCV to manipulate images in HSV and LAB color spaces, improving both visual clarity and aesthetic quality.
+        </p>
+
+        <ul class="project-list">
+          <li>Implemented hybrid image creation using Python by blending high- and low-frequency components, 
+            producing images that change perception with viewing distance</li>
+          <li>Applied Fourier transforms and frequency filtering (Gaussian and Laplacian) to analyze and visualize image components</li>
+          <li>Enhanced images through contrast, color, and hue adjustments using OpenCV, 
+            demonstrating control over color spaces and image enhancement techniques</li>
+        </ul>
+
+        <div class="project-links">
+          <a class="btn" href="https://github.com/connie4-beep/hybrid_images.git" target="_blank" rel="noopener noreferrer">
+            View Code
+          </a>
+
+          <button class="btn secondary" onclick="toggleDetails('hybrid-details')">
+            Show Details
+          </button>
+        </div>
+
+        <div id="hybrid-details" class="hidden details-box">
+          <p><strong>Tech Stack:</strong> Python, OpenCV, NumPy</p>
+          <p><strong>Skills:</strong> Image processing, Fourier transforms, frequency filtering, color space manipulation</p>
+        </div>
+
+      </div>
+
+      <div class="project-card">
+        <h3>Research: Demographic Determinants of Political Donations</h3>
+        <p class="project-desc">
+          This project analyzed the impact of advertising and social media exposure on donor behavior, 
+          focusing on understanding how outreach strategies influence contribution patterns. 
+          I cleaned and merged large ZIP-level datasets from multiple sources, enabling a comprehensive county-level analysis. 
+          Using statistical models, I quantified the relationships between demographic factors, social media engagement, 
+          and donation activity, uncovering insights into how different outreach methods drive donor participation.
+        </p>
+
+        <ul class="project-list">
+          <li>Data merging + cleaning in R</li>
+          <li>Visualization: heatmaps, time-series trends, geographic mapping</li>
+          <li>Research-focused analysis of market and consumer behavior</li>
+        </ul>
+
+      </div>
+
+      <div class="project-card">
+        <h3>Research: Walmart Sales Forecasting Analysis</h3>
+        <p class="project-desc">
+          Developed a hybrid Python-R analysis pipeline to clean, preprocess, and analyze departmental sales data. 
+          Implemented data cleaning techniques to handle missing values and outliers, 
+          performed exploratory data analysis and statistical modeling in R to identify key seasonal trends and revenue drivers, 
+          and built predictive models to forecast weekly sales, enabling optimized inventory planning for stakeholders.
+        </p>
+
+        <ul class="project-list">
+          <li>Data merging + cleaning in R</li>
+          <li>Visualization: heatmaps, time-series trends, forecasting</li>
+          <li>Research-focused analysis of market and consumer behavior</li>
+        </ul>
+
+      </div>
+
+
+
+    </section>
+
+    <section class="section">
+      <h2>Skills</h2>
+      <div class="skills">
+        <span>Python</span>
+        <span>R</span>
+        <span>Java</span>
+        <span>C++</span>
+        <span>Git</span>
+        <span>Data Analysis</span>
+        <span>Machine Learning</span>
+        <span>Data Visualization</span>
+        <span>UI/UX Design</span>
+        <span>Technical Writing</span>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Contact</h2>
+      <p>If you'd like to connect, feel free to email me:</p>
+      <p><strong>📧 connie4@illinois.edu</strong></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>© <span id="year"></span> Connie Zhang. Built with GitHub Pages.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
