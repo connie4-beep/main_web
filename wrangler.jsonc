@@ -1,5 +1,7 @@
 {
-  "name": "main-web-worker",
+  "name": "main-web",
   "compatibility_date": "2026-02-21",
-  "main": "src/index.ts"
+  "assets": {
+    "directory": "./dist"
+  }    
 }
