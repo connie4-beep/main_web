@@ -146,22 +146,84 @@
       <div class="project-card">
         <h3>Research: Walmart Sales Forecasting Analysis</h3>
         <p class="project-desc">
-          Developed a hybrid Python-R analysis pipeline to clean, preprocess, and analyze departmental sales data. 
-          Implemented data cleaning techniques to handle missing values and outliers, 
-          performed exploratory data analysis and statistical modeling in R to identify key seasonal trends and revenue drivers, 
-          and built predictive models to forecast weekly sales, enabling optimized inventory planning for stakeholders.
+          This project is a comprehensive sales forecasting pipeline designed to optimize inventory management and planning 
+          for retail stakeholders. Built entirely in Python, the system takes raw departmental sales data across seven distinct 
+          categories (Foods, Hobbies, and Household), automatically cleans it by handling missing values and outliers, and performs 
+          exploratory data analysis to isolate key seasonal trends and revenue drivers. The processed data is then fed into an advanced 
+          DeepAR time series model to predict future weekly sales volumes. By accurately forecasting these metrics at the departmental level, 
+          achieving a strong overall mean absolute percentage error (MAPE) of 13.58% and an RMSE of 92.91, the project provides business leaders with the 
+          reliable analytical insights needed to prevent stockouts, reduce excess inventory, and maximize revenue.
         </p>
 
         <ul class="project-list">
-          <li>Data merging + cleaning in R and Python</li>
+          <li>Data merging + cleaning in Python</li>
           <li>Visualization: heatmaps, time-series trends, forecasting</li>
           <li>Research-focused analysis of market and consumer behavior</li>
+          <li>Machine Learning: Time Series Forecasting</li>
         </ul>
 
         <div class="project-links">
           <a href="https://github.com/connie4-beep/Walmart-Sales-Forecasting-DeepAR" target="_blank" rel="noopener noreferrer" class="github-link">
             View Code on GitHub →
           </a>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h3>Uber Re-Dispatch Case Study | Product Teardown & UI/UX Redesign</h3>
+        <p class="project-desc">
+          An analytical product case study examining the friction between back-end algorithmic dispatch logic and human user experience (UX) during time-sensitive, high-stakes trips.
+        </p>
+
+        <ul class="project-list">
+          <li><strong>Problem:</strong> Users face anxiety and missed appointments when algorithms silently re-dispatch drivers.</li>
+          <li><strong>Hypothesis:</strong> Re-dispatch logic over-indexes on global marketplace efficiency at the cost of individual trip reliability.</li>
+          <li><strong>Solution:</strong> Authored an analytical product essay and designed high-fidelity UI mockups proposing a "trip-lock" feature and transparency alerts to balance marketplace efficiency with rider trust.</li>
+        </ul>
+
+        <div class="project-links">
+          <a class="btn" href="uber-case-study.html" target="_blank" rel="noopener noreferrer">
+            Read Case Study
+          </a>
+
+          <button class="btn secondary" onclick="toggleDetails('uber-details')">
+            Show Details
+          </button>
+        </div>
+
+        <div id="uber-details" class="hidden details-box">
+          <p><strong>Skills:</strong> Product Strategy, UX Research, System Architecture Analysis, UI/UX Design</p>
+          <p><strong>Tools:</strong> Figma, Analytical Writing</p>
+          <p><em>*Detailed breakdown of batched matching algorithms and Before/After UI mockups featured in the full case study.</em></p>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <h3>Shared Kitchen Booking Platform 🚧 <span style="font-size: 0.8rem; font-weight: normal; color: #666;">(In Development)</span></h3>
+        <p class="project-desc">
+          Coordinating time in a shared kitchen space can be a hassle, so I am currently leading the product development of a new reservation web app to solve this. We are actively building out the platform, focusing heavily on a frictionless user experience and a secure, reliable backend.
+        </p>
+
+        <ul class="project-list">
+          <li><strong>Streamlined UX:</strong> Based on early peer feedback, I redesigned the core booking flow, simplifying it from 5 screens down to just 3 to minimize user drop-off.</li>
+          <li><strong>User Testing:</strong> Currently designing high-fidelity interfaces in Figma and preparing to lead formal user testing sessions in collaboration with university faculty.</li>
+          <li><strong>Secure Architecture:</strong> Collaborating on the technical implementation to integrate a Ruby on Rails and MySQL backend, building custom API endpoints to handle secure authentication and booking data.</li>
+        </ul>
+
+        <div class="project-links">
+          <span class="btn" style="background: #888; cursor: not-allowed; box-shadow: none;">
+            Live Link Coming Soon
+          </span>
+
+          <button class="btn secondary" onclick="toggleDetails('kitchen-details')">
+            Show Details
+          </button>
+        </div>
+
+        <div id="kitchen-details" class="hidden details-box">
+          <p><strong>Tech Stack:</strong> Ruby on Rails, MySQL, JavaScript, Figma</p>
+          <p><strong>Timeline:</strong> March 2026 – Present</p>
+          <p><strong>Focus Areas:</strong> Product Management, UI/UX Design, API Integration, User Testing</p>
         </div>
       </div>
 
@@ -180,8 +242,10 @@
         <span>Data Analysis</span>
         <span>Machine Learning</span>
         <span>Data Visualization</span>
+        <span>Figma</span>
         <span>UI/UX Design</span>
-        <span>Technical Writing</span>
+        <span>Product Strategy</span>
+        <span>Analytical Writing</span>
       </div>
     </section>
 
@@ -193,7 +257,7 @@
   </main>
 
   <footer class="footer">
-    <p>© <span id="year"></span> Connie Zhang. Built with GitHub Pages.</p>
+    <p>© <span id="year"></span> Connie Zhang</p>
   </footer>
 
   <script src="script.js"></script>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Uber Case Study | Connie Zhang</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <header class="header">
+    <div class="container">
+      <h1 class="title">Uber Re-Dispatch Case Study</h1>
+      <p class="subtitle">Fixing the friction between algorithmic efficiency and rider trust.</p>
+      
+      <div class="links">
+        <a href="index.html">← Back to Portfolio</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    
+    <section class="section">
+      <h2>1. The Problem</h2>
+      <p>
+        During high-stakes, time-sensitive trips (like traveling to the airport), Uber users experience severe anxiety and missed appointments when the algorithm silently re-dispatches their driver to someone further away.
+      </p>
+      <p>
+        <strong>Hypothesis:</strong> Uber's re-dispatch logic over-indexes on global marketplace efficiency at the cost of individual trip reliability.
+      </p>
+      </section>
+
+    <section class="section">
+      <h2>2. System Architecture: Why It Happens</h2>
+      <p>
+        To understand the UX failure, we have to look at the backend... 
+        [You will write your explanation of Batched Matching here]
+      </p>
+    </section>
+
+    <section class="section">
+      <h2>3. Proposed Solution & UI Redesign</h2>
+      <p>
+        To balance marketplace efficiency with rider trust, I propose a <strong>"Trip-Lock"</strong> feature for high-stakes destinations (like airports), paired with a transparent notification system.
+      </p>
+      
+      <div style="background: #e9ecef; padding: 40px; text-align: center; border-radius: 12px; margin-top: 20px;">
+        <p style="color: #6c757d; font-style: italic;">[ Figma Before & After Mockup Images Will Go Here ]</p>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>4. Success Metrics</h2>
+      <ul class="project-list">
+        <li>Decrease in rider-initiated cancellations during airport trips.</li>
+        <li>Decrease in customer support tickets regarding "driver changed" or "missed flight."</li>
+        <li>Increase in on-time arrivals to major transit hubs.</li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>© <span id="year"></span> Connie Zhang. Built with GitHub Pages.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
