@@ -3,64 +3,763 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Uber Re-Dispatch Case Study — Analyzing the friction between algorithmic efficiency and rider trust. Product teardown & UI/UX redesign by Connie Zhang." />
   <title>Uber Case Study | Connie Zhang</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ===== Case Study Page Styles ===== */
+    .case-hero {
+      padding: 140px 0 60px;
+      text-align: center;
+      position: relative;
+    }
+
+    .case-hero::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 500px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .case-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: var(--space-lg);
+      transition: color var(--transition-fast);
+    }
+
+    .case-back:hover {
+      color: var(--text-primary);
+    }
+
+    .case-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text-primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .case-subtitle-text {
+      font-size: 1.2rem;
+      color: var(--accent-violet);
+      font-weight: 500;
+      margin-bottom: var(--space-md);
+    }
+
+    .case-desc {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 640px;
+      margin: 0 auto;
+      line-height: 1.7;
+    }
+
+    /* Tags */
+    .case-tags {
+      display: flex;
+      gap: var(--space-sm);
+      justify-content: center;
+      margin-bottom: var(--space-lg);
+      flex-wrap: wrap;
+    }
+
+    .case-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 14px;
+      border-radius: var(--radius-pill);
+      background: rgba(124, 58, 237, 0.1);
+      color: #a78bfa;
+      border: 1px solid rgba(124, 58, 237, 0.2);
+    }
+
+    /* Meta bar */
+    .case-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+      padding: var(--space-xl) 0;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+      margin-bottom: var(--space-2xl);
+    }
+
+    .case-meta-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    .case-meta-value {
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    /* Case body */
+    .case-body {
+      padding-bottom: var(--space-3xl);
+    }
+
+    .case-body .case-section {
+      margin-bottom: var(--space-3xl);
+    }
+
+    .case-body .case-section-number {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--text-muted);
+      margin-bottom: var(--space-sm);
+    }
+
+    .case-body .case-section h2 {
+      font-family: var(--font-heading);
+      font-size: clamp(1.5rem, 3vw, 2rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: var(--space-lg);
+      letter-spacing: -0.02em;
+    }
+
+    .case-body p {
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: var(--space-md);
+      font-size: 0.95rem;
+    }
+
+    .case-body strong {
+      color: var(--text-primary);
+    }
+
+    /* Callout boxes */
+    .callout {
+      padding: var(--space-lg);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-lg);
+    }
+
+    .callout-problem {
+      background: rgba(239, 68, 68, 0.08);
+      border-left: 4px solid #ef4444;
+    }
+
+    .callout-problem p {
+      color: var(--text-primary);
+      font-size: 1.05rem;
+      margin: 0;
+    }
+
+    .callout-hypothesis {
+      background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(124, 58, 237, 0.08));
+      border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
+    .callout-hypothesis p:first-child {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .callout-howto {
+      background: rgba(234, 179, 8, 0.08);
+      border-left: 4px solid #eab308;
+    }
+
+    /* Scenario list */
+    .scenario-list {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .scenario-list h3 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-md);
+    }
+
+    .scenario-item {
+      display: flex;
+      gap: var(--space-md);
+      margin-bottom: var(--space-md);
+    }
+
+    .scenario-item:last-child {
+      margin-bottom: 0;
+    }
+
+    .scenario-dot {
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 8px;
+    }
+
+    .scenario-item p {
+      margin: 0;
+    }
+
+    /* Two-column comparison */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .comparison-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+    }
+
+    .comparison-card h3 {
+      font-family: var(--font-heading);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-md);
+    }
+
+    .comparison-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .comparison-list li {
+      display: flex;
+      gap: var(--space-sm);
+      margin-bottom: var(--space-sm);
+      color: var(--text-secondary);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    .check-green { color: #22c55e; flex-shrink: 0; }
+    .cross-red { color: #ef4444; flex-shrink: 0; }
+    .check-blue { color: #60a5fa; flex-shrink: 0; }
+    .dot-muted { color: var(--text-muted); flex-shrink: 0; }
+
+    /* Feature sections */
+    .feature-block {
+      margin-bottom: var(--space-2xl);
+    }
+
+    .feature-block h3 {
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-lg);
+    }
+
+    /* Mockup display */
+    .mockup-container {
+      background: var(--bg-secondary);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+      margin-bottom: var(--space-lg);
+      display: flex;
+      justify-content: center;
+      border: 1px solid var(--border-subtle);
+    }
+
+    .mockup-container img {
+      max-width: 360px;
+      width: 100%;
+      height: auto;
+      border-radius: var(--radius-md);
+    }
+
+    /* Design principles */
+    .design-list {
+      list-style: disc;
+      padding-left: 24px;
+      margin-bottom: var(--space-md);
+    }
+
+    .design-list li {
+      color: var(--text-secondary);
+      margin-bottom: var(--space-sm);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    /* Ordered list */
+    .ordered-list {
+      list-style: decimal;
+      padding-left: 24px;
+      margin-bottom: var(--space-md);
+    }
+
+    .ordered-list li {
+      color: var(--text-secondary);
+      margin-bottom: var(--space-sm);
+      font-size: 0.92rem;
+      line-height: 1.6;
+    }
+
+    /* Metrics cards */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .metric-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      text-align: center;
+    }
+
+    .metric-value {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: var(--space-xs);
+    }
+
+    .metric-card:nth-child(1) .metric-value { color: #22c55e; }
+    .metric-card:nth-child(2) .metric-value { color: #60a5fa; }
+    .metric-card:nth-child(3) .metric-value { color: #a78bfa; }
+
+    .metric-label {
+      font-weight: 600;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      margin-bottom: var(--space-xs);
+    }
+
+    .metric-desc {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      line-height: 1.4;
+    }
+
+    /* AB test box */
+    .ab-test-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-md);
+      padding: var(--space-lg);
+      margin-bottom: var(--space-lg);
+    }
+
+    .ab-test-box h3 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-md);
+    }
+
+    .ab-row {
+      display: flex;
+      gap: var(--space-md);
+      margin-bottom: var(--space-sm);
+      font-size: 0.92rem;
+    }
+
+    .ab-label {
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+    }
+
+    .ab-desc {
+      color: var(--text-secondary);
+    }
+
+    /* Principle block */
+    .principle {
+      border-left: 4px solid var(--text-primary);
+      padding-left: var(--space-lg);
+      padding-top: var(--space-sm);
+      padding-bottom: var(--space-sm);
+      margin-bottom: var(--space-lg);
+    }
+
+    .principle h3 {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .principle p {
+      margin: 0;
+    }
+
+    /* Reflection box */
+    .reflection-box {
+      background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06));
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: var(--space-xl);
+    }
+
+    .reflection-box p {
+      font-size: 1rem;
+      line-height: 1.8;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .case-meta {
+        grid-template-columns: 1fr;
+        gap: var(--space-md);
+      }
+
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 
 <body>
-  <header class="header">
-    <div class="container">
-      <h1 class="title">Uber Re-Dispatch Case Study</h1>
-      <p class="subtitle">Fixing the friction between algorithmic efficiency and rider trust.</p>
-      
-      <div class="links">
-        <a href="index.html">← Back to Portfolio</a>
+  <!-- Navigation -->
+  <nav class="navbar scrolled" id="navbar">
+    <div class="navbar-inner">
+      <a href="index.html" class="nav-logo">CZ</a>
+
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#projects">Projects</a></li>
+        <li><a href="index.html#skills">Skills</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+
+      <div class="nav-social">
+        <a href="https://github.com/connie4-beep" target="_blank" rel="noopener noreferrer" aria-label="GitHub">GH</a>
+        <a href="https://www.linkedin.com/in/connie-z-51727529a/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">LI</a>
       </div>
     </div>
-  </header>
+  </nav>
 
-  <main class="container">
-    
-    <section class="section">
-      <h2>1. The Problem</h2>
-      <p>
-        During high-stakes, time-sensitive trips (like traveling to the airport), Uber users experience severe anxiety and missed appointments when the algorithm silently re-dispatches their driver to someone further away.
-      </p>
-      <p>
-        <strong>Hypothesis:</strong> Uber's re-dispatch logic over-indexes on global marketplace efficiency at the cost of individual trip reliability.
-      </p>
-      </section>
+  <!-- Hero -->
+  <div class="case-hero">
+    <div class="container">
+      <a href="index.html#projects" class="case-back">← Back to Portfolio</a>
 
-    <section class="section">
-      <h2>2. System Architecture: Why It Happens</h2>
-      <p>
-        To understand the UX failure, we have to look at the backend... 
-        [You will write your explanation of Batched Matching here]
-      </p>
-    </section>
+      <div class="case-tags">
+        <span class="case-tag">Product Design</span>
+        <span class="case-tag">UX Research</span>
+        <span class="case-tag">Case Study</span>
+      </div>
 
-    <section class="section">
-      <h2>3. Proposed Solution & UI Redesign</h2>
-      <p>
-        To balance marketplace efficiency with rider trust, I propose a <strong>"Trip-Lock"</strong> feature for high-stakes destinations (like airports), paired with a transparent notification system.
+      <h1 class="case-title">Uber Re-Dispatch Case Study</h1>
+      <p class="case-subtitle-text">Product Teardown &amp; UI/UX Redesign</p>
+      <p class="case-desc">
+        An analytical product case study examining the friction between back-end algorithmic 
+        dispatch logic and human user experience during time-sensitive, high-stakes trips.
       </p>
-      
-      <div style="background: #e9ecef; padding: 40px; text-align: center; border-radius: 12px; margin-top: 20px;">
-        <p style="color: #6c757d; font-style: italic;">[ Figma Before & After Mockup Images Will Go Here ]</p>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <main class="container case-body">
+
+    <!-- Meta bar -->
+    <div class="case-meta">
+      <div>
+        <div class="case-meta-label">Role</div>
+        <div class="case-meta-value">Product Designer &amp; Analyst</div>
+      </div>
+      <div>
+        <div class="case-meta-label">Deliverables</div>
+        <div class="case-meta-value">Product Essay, UI Mockups, Design System</div>
+      </div>
+      <div>
+        <div class="case-meta-label">Tools</div>
+        <div class="case-meta-value">Figma, User Research, Data Analysis</div>
+      </div>
+    </div>
+
+    <!-- Section 1: Problem -->
+    <section class="case-section">
+      <div class="case-section-number">01 — Problem</div>
+      <h2>The Silent Switch Problem</h2>
+
+      <div class="callout callout-problem">
+        <p>Users face anxiety and missed appointments when algorithms silently re-dispatch drivers without clear communication or user consent.</p>
+      </div>
+
+      <p>
+        Uber's dispatch algorithm optimizes for marketplace efficiency — matching drivers and riders 
+        to minimize overall wait times and maximize utilization. However, this optimization happens 
+        invisibly to end users.
+      </p>
+
+      <div class="scenario-list">
+        <h3>Real User Scenarios</h3>
+        <div class="scenario-item">
+          <div class="scenario-dot"></div>
+          <p><strong>Airport trips:</strong> Driver shown as "2 min away" suddenly becomes "8 min away" with no explanation, risking flight check-in deadlines.</p>
+        </div>
+        <div class="scenario-item">
+          <div class="scenario-dot"></div>
+          <p><strong>Medical appointments:</strong> Users watching their driver approach only to see them reassigned, causing panic about missing critical appointments.</p>
+        </div>
+        <div class="scenario-item">
+          <div class="scenario-dot"></div>
+          <p><strong>Business meetings:</strong> Lack of arrival time certainty makes it impossible to plan with confidence.</p>
+        </div>
       </div>
     </section>
 
-    <section class="section">
-      <h2>4. Success Metrics</h2>
-      <ul class="project-list">
-        <li>Decrease in rider-initiated cancellations during airport trips.</li>
-        <li>Decrease in customer support tickets regarding "driver changed" or "missed flight."</li>
-        <li>Increase in on-time arrivals to major transit hubs.</li>
-      </ul>
+    <!-- Section 2: Hypothesis -->
+    <section class="case-section">
+      <div class="case-section-number">02 — Hypothesis</div>
+      <h2>The Efficiency vs. Trust Trade-off</h2>
+
+      <div class="callout callout-hypothesis">
+        <p>Re-dispatch logic over-indexes on global marketplace efficiency at the cost of individual trip reliability and user trust.</p>
+        <p>While re-dispatch may improve system-wide metrics, it creates a psychological contract violation for individual users who believe they have a committed driver.</p>
+      </div>
+
+      <div class="comparison-grid">
+        <div class="comparison-card">
+          <h3>System Perspective (Algorithm)</h3>
+          <ul class="comparison-list">
+            <li><span class="check-green">✓</span> <span>Optimizes for average wait times across all riders</span></li>
+            <li><span class="check-green">✓</span> <span>Maximizes driver utilization and earnings</span></li>
+            <li><span class="check-green">✓</span> <span>Reduces total miles driven (environmental benefit)</span></li>
+            <li><span class="check-green">✓</span> <span>Improves marketplace liquidity</span></li>
+          </ul>
+        </div>
+        <div class="comparison-card">
+          <h3>User Perspective (Individual)</h3>
+          <ul class="comparison-list">
+            <li><span class="cross-red">✗</span> <span>Feels abandoned when driver is reassigned</span></li>
+            <li><span class="cross-red">✗</span> <span>Loses trust in ETA accuracy</span></li>
+            <li><span class="cross-red">✗</span> <span>Cannot plan with certainty for time-critical trips</span></li>
+            <li><span class="cross-red">✗</span> <span>No control or visibility into decision-making</span></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 3: Solution -->
+    <section class="case-section">
+      <div class="case-section-number">03 — Solution</div>
+      <h2>Designing for Trust &amp; Transparency</h2>
+
+      <p style="font-size: 1.05rem;">
+        A two-pronged approach combining transparency alerts with user-controlled trip-lock 
+        functionality to balance marketplace efficiency with rider trust.
+      </p>
+
+      <!-- Feature 1 -->
+      <div class="feature-block">
+        <h3>Feature 1: Re-Dispatch Transparency Alerts</h3>
+
+        <div class="mockup-container">
+          <img src="uber-alert-mockup.png" alt="UI mockup showing a Driver Reassigned notification with previous and new ETA comparison" loading="lazy" />
+        </div>
+
+        <p>
+          <strong>Design Principle:</strong> Make the invisible visible. When re-dispatch occurs, 
+          inform users immediately with clear before/after comparison.
+        </p>
+
+        <ul class="design-list">
+          <li>Show both previous and new ETA for transparency</li>
+          <li>Explain why the change happened ("closer driver found")</li>
+          <li>Display new driver details to rebuild trust</li>
+          <li>Only show when re-dispatch increases wait time significantly</li>
+        </ul>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-block">
+        <h3>Feature 2: Trip-Lock for High-Stakes Rides</h3>
+
+        <div class="mockup-container">
+          <img src="uber-triplock-mockup.png" alt="UI mockup showing Trip Lock Active feature with driver details and commitment guarantee" loading="lazy" />
+        </div>
+
+        <p>
+          <strong>Design Principle:</strong> Give users control over commitment level for critical trips.
+        </p>
+
+        <div class="callout callout-howto">
+          <p><strong>How Trip-Lock Works:</strong></p>
+          <ol class="ordered-list">
+            <li>User can enable "Trip Lock" before or after driver is matched</li>
+            <li>When locked, the algorithm will NOT re-dispatch that driver to another rider</li>
+            <li>User accepts that they may wait slightly longer initially for optimal match</li>
+            <li>Provides peace of mind for airports, medical appointments, and business meetings</li>
+          </ol>
+        </div>
+
+        <p>
+          This feature acknowledges that not all trips are equal — some require guaranteed 
+          reliability over marketplace optimization.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-block">
+        <h3>Feature 3: Context-Aware Defaults</h3>
+
+        <div class="comparison-grid">
+          <div class="comparison-card">
+            <h3>Auto-Enable Trip Lock For:</h3>
+            <ul class="comparison-list">
+              <li><span class="check-blue">✓</span> <span>Airport pickups/drop-offs</span></li>
+              <li><span class="check-blue">✓</span> <span>Scheduled rides booked in advance</span></li>
+              <li><span class="check-blue">✓</span> <span>Premium service tiers (Uber Black, XL)</span></li>
+              <li><span class="check-blue">✓</span> <span>Trips during peak demand periods</span></li>
+            </ul>
+          </div>
+          <div class="comparison-card">
+            <h3>Keep Flexible For:</h3>
+            <ul class="comparison-list">
+              <li><span class="dot-muted">○</span> <span>Casual trips with no time pressure</span></li>
+              <li><span class="dot-muted">○</span> <span>Short-distance UberX rides</span></li>
+              <li><span class="dot-muted">○</span> <span>Users who historically don't cancel</span></li>
+              <li><span class="dot-muted">○</span> <span>Low-demand time windows</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Impact -->
+    <section class="case-section">
+      <div class="case-section-number">04 — Expected Impact</div>
+      <h2>Success Metrics</h2>
+
+      <div class="metrics-grid">
+        <div class="metric-card">
+          <div class="metric-value">↑ 25%</div>
+          <div class="metric-label">User Trust Score</div>
+          <div class="metric-desc">Measured via post-ride NPS and "reliability" rating</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">↓ 40%</div>
+          <div class="metric-label">Re-Dispatch Complaints</div>
+          <div class="metric-desc">Support tickets related to driver switching</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-value">↑ 15%</div>
+          <div class="metric-label">Premium Tier Adoption</div>
+          <div class="metric-desc">Users upgrading for guaranteed reliability</div>
+        </div>
+      </div>
+
+      <div class="ab-test-box">
+        <h3>A/B Test Framework</h3>
+        <div class="ab-row">
+          <span class="ab-label">Control:</span>
+          <span class="ab-desc">Current silent re-dispatch behavior</span>
+        </div>
+        <div class="ab-row">
+          <span class="ab-label">Variant A:</span>
+          <span class="ab-desc">Transparency alerts only (no trip-lock)</span>
+        </div>
+        <div class="ab-row">
+          <span class="ab-label">Variant B:</span>
+          <span class="ab-desc">Trip-lock with opt-in (manual activation)</span>
+        </div>
+        <div class="ab-row">
+          <span class="ab-label">Variant C:</span>
+          <span class="ab-desc">Full solution (alerts + smart defaults for trip-lock)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 5: Key Insights -->
+    <section class="case-section">
+      <div class="case-section-number">05 — Key Insights</div>
+      <h2>Design Principles</h2>
+
+      <div class="principle">
+        <h3>1. Algorithmic efficiency ≠ User satisfaction</h3>
+        <p>What's optimal for the system may feel like a betrayal to the individual. Product design must bridge this gap with transparency and control.</p>
+      </div>
+
+      <div class="principle">
+        <h3>2. Context determines user needs</h3>
+        <p>A casual ride home has different psychological requirements than an airport trip. Smart defaults can predict and serve these varying needs.</p>
+      </div>
+
+      <div class="principle">
+        <h3>3. Transparency builds trust, even in failures</h3>
+        <p>Users are more forgiving when they understand why something happened. Silent changes erode trust faster than explained delays.</p>
+      </div>
+
+      <div class="principle">
+        <h3>4. Give users agency in high-stakes moments</h3>
+        <p>When outcomes truly matter, users should have the ability to prioritize reliability over optimization — even at a cost.</p>
+      </div>
+    </section>
+
+    <!-- Section 6: Reflection -->
+    <section class="case-section">
+      <div class="case-section-number">06 — Reflection</div>
+      <h2>What I Learned</h2>
+
+      <div class="reflection-box">
+        <p>
+          This case study reinforced that great product design lives at the intersection of 
+          business logic, technical constraints, and human psychology. Uber's re-dispatch algorithm 
+          is mathematically sound — but it fails the "does this feel right?" test for users in 
+          high-pressure scenarios.
+        </p>
+        <p>
+          The proposed solutions don't require rebuilding the algorithm. Instead, they add a thin 
+          layer of UX that acknowledges the emotional contract between user and platform. Sometimes 
+          the most impactful design work isn't adding complexity — it's making complex systems feel human.
+        </p>
+        <p>
+          <strong>Next steps:</strong> User testing with prototypes, quantitative analysis of 
+          re-dispatch patterns, and collaboration with data science teams to model the business 
+          impact of trip-lock adoption.
+        </p>
+      </div>
     </section>
 
   </main>
 
+  <!-- Footer -->
   <footer class="footer">
     <p>© <span id="year"></span> Connie Zhang</p>
   </footer>

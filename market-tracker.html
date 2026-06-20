@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Market Tracker & AI Analyst</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+  <style>
+    /* Dashboard specific overrides */
+    body {
+      background-color: var(--bg-primary);
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .dashboard-nav {
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(250, 249, 248, 0.85);
+      backdrop-filter: blur(10px);
+    }
+
+    .dashboard-logo {
+      font-family: var(--font-heading);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      text-decoration: none;
+    }
+
+    .dashboard-back {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s ease;
+    }
+
+    .dashboard-back:hover {
+      color: var(--text-primary);
+    }
+
+    .dashboard-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 30px;
+      flex-grow: 1;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .dashboard-header h1 {
+      font-family: var(--font-heading);
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+
+    .dashboard-header p {
+      color: var(--text-secondary);
+      margin-bottom: 30px;
+    }
+
+    /* Control Panel */
+    .control-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 20px 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 30px;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .control-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    select {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+
+    select:focus {
+      border-color: var(--accent-violet);
+    }
+
+    /* Timeframe buttons */
+    .timeframe-group {
+      display: flex;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      overflow: hidden;
+    }
+
+    .timeframe-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      padding: 10px 16px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border-right: 1px solid var(--border-subtle);
+    }
+
+    .timeframe-btn:last-child {
+      border-right: none;
+    }
+
+    .timeframe-btn:hover {
+      background: rgba(44, 42, 41, 0.05);
+      color: var(--text-primary);
+    }
+
+    .timeframe-btn.active {
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      font-weight: 600;
+    }
+
+    /* Main Split View */
+    .split-view {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+      height: 600px;
+    }
+
+    /* Chart Area */
+    .chart-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      height: 100%;
+      box-sizing: border-box;
+      position: relative;
+    }
+
+    #plotly-chart {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .loading-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(250, 249, 248, 0.7);
+      backdrop-filter: blur(4px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: var(--radius-lg);
+      z-index: 10;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    
+    .loading-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid rgba(34, 197, 94, 0.3);
+      border-radius: 50%;
+      border-top-color: #22c55e;
+      animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Chat Area */
+    .chat-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-radius: var(--radius-lg);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .chat-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(44, 42, 41, 0.05);
+    }
+
+    .ai-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #22c55e, #10b981);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+
+    .chat-header-title {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .chat-header-status {
+      font-size: 0.75rem;
+      color: #4ade80;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: #4ade80;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #4ade80;
+    }
+
+    .chat-messages {
+      flex-grow: 1;
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .message {
+      max-width: 85%;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .message.assistant {
+      background: rgba(44, 42, 41, 0.05);
+      border: 1px solid var(--border-subtle);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+
+    .message.user {
+      background: var(--accent-violet);
+      color: #000;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+      font-weight: 500;
+    }
+
+    .chat-input-area {
+      padding: 16px;
+      border-top: 1px solid var(--border-subtle);
+      background: rgba(44, 42, 41, 0.05);
+    }
+
+    .chat-form {
+      display: flex;
+      gap: 10px;
+    }
+
+    .chat-input {
+      flex-grow: 1;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      padding: 12px 16px;
+      border-radius: var(--radius-pill);
+      color: var(--text-primary);
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .chat-input:focus {
+      border-color: var(--accent-violet);
+    }
+
+    .chat-submit {
+      background: var(--accent-violet);
+      color: #000;
+      border: none;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .chat-submit:hover {
+      transform: scale(1.05);
+    }
+    
+    .chat-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .typing-indicator {
+      display: none;
+      gap: 4px;
+      padding: 12px 16px;
+      background: rgba(44, 42, 41, 0.05);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      border-bottom-left-radius: 4px;
+      align-self: flex-start;
+      width: fit-content;
+    }
+
+    .typing-indicator.active {
+      display: flex;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--text-muted);
+      border-radius: 50%;
+      animation: bounce 1.4s infinite ease-in-out both;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+    .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+    @keyframes bounce {
+      0%, 80%, 100% { transform: scale(0); }
+      40% { transform: scale(1); }
+    }
+
+    @media (max-width: 992px) {
+      .split-view {
+        grid-template-columns: 1fr;
+        height: auto;
+      }
+      .chart-container {
+        height: 400px;
+      }
+      .chat-container {
+        height: 500px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <nav class="dashboard-nav">
+    <a href="index.html" class="dashboard-logo">CZ</a>
+    <a href="index.html#projects" class="dashboard-back">← Back to Portfolio</a>
+  </nav>
+
+  <main class="dashboard-container">
+    <div class="dashboard-header">
+      <h1>Market Tracker & AI Analyst</h1>
+      <p>Interactive Demo — Real-time visualization and AI-powered market analysis</p>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+      <div class="control-group">
+        <label for="sector-select">1. Choose a Sector</label>
+        <select id="sector-select">
+          <option value="Technology" selected>Technology</option>
+          <option value="Healthcare">Healthcare</option>
+          <option value="Finance">Finance</option>
+          <option value="Consumer">Consumer Discretionary</option>
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label for="asset-select">2. Select an Asset</label>
+        <select id="asset-select">
+          <!-- Populated by JS -->
+        </select>
+      </div>
+
+      <div class="control-group">
+        <label>3. Timeframe</label>
+        <div class="timeframe-group" id="timeframe-controls">
+          <button class="timeframe-btn active" data-tf="1d">1D</button>
+          <button class="timeframe-btn" data-tf="1w">1W</button>
+          <button class="timeframe-btn" data-tf="1m">1M</button>
+          <button class="timeframe-btn" data-tf="3m">3M</button>
+          <button class="timeframe-btn" data-tf="1y">1Y</button>
+          <button class="timeframe-btn" data-tf="5y">5Y</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Split View -->
+    <div class="split-view">
+      
+      <!-- Chart Area -->
+      <div class="chart-container">
+        <div class="loading-overlay" id="chart-loading">
+          <div class="spinner"></div>
+        </div>
+        <div id="plotly-chart"></div>
+      </div>
+
+      <!-- Chat Area -->
+      <div class="chat-container">
+        <div class="chat-header">
+          <div class="ai-avatar">🤖</div>
+          <div>
+            <div class="chat-header-title">Gemini Market Analyst</div>
+            <div class="chat-header-status"><span class="status-dot"></span> Online</div>
+          </div>
+        </div>
+
+        <div class="chat-messages" id="chat-messages">
+          <div class="message assistant">
+            Hello! I am your AI Market Analyst. I can help you analyze trends, summarize news, or explain the current chart for <strong>AAPL</strong>. What would you like to know?
+          </div>
+        </div>
+        
+        <div class="typing-indicator" id="typing-indicator" style="margin: 0 20px 20px;">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+
+        <div class="chat-input-area">
+          <form class="chat-form" id="chat-form">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Ask about this stock..." autocomplete="off" />
+            <button type="submit" class="chat-submit" id="chat-submit">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"></line>
+                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+              </svg>
+            </button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // --- Data Configuration ---
+    const MARKET_SECTORS = {
+      'Technology': ['AAPL', 'MSFT', 'NVDA', 'GOOGL', 'META', 'AMD'],
+      'Healthcare': ['LLY', 'UNH', 'JNJ', 'MRK', 'ABBV', 'PFE'],
+      'Finance': ['JPM', 'V', 'MA', 'BAC', 'WFC', 'GS'],
+      'Consumer': ['AMZN', 'TSLA', 'HD', 'MCD', 'NKE', 'SBUX']
+    };
+
+    const MOCK_COMPANY_INFO = {
+      'AAPL': 'Apple Inc. designs, manufactures, and markets smartphones, personal computers, tablets, wearables, and accessories worldwide. Recent news indicates strong iPhone 16 sales expectations and growth in the Services division.',
+      'MSFT': 'Microsoft Corporation develops, licenses, and supports software, services, devices, and solutions worldwide. The stock has seen massive momentum driven by Azure cloud growth and OpenAI integrations.',
+      'NVDA': 'NVIDIA Corporation provides graphics, and compute and networking solutions. Unprecedented demand for AI accelerators (H100/Blackwell) continues to drive revenue and margin expansion.',
+      'TSLA': 'Tesla, Inc. designs, develops, manufactures, leases, and sells electric vehicles, and energy generation and storage systems. Recent volatility is tied to margins and FSD timeline updates.'
+    };
+
+    // State
+    let currentAsset = 'AAPL';
+    let currentTimeframe = '1d';
+    
+    // DOM Elements
+    const sectorSelect = document.getElementById('sector-select');
+    const assetSelect = document.getElementById('asset-select');
+    const timeframeBtns = document.querySelectorAll('.timeframe-btn');
+    const chartLoading = document.getElementById('chart-loading');
+    
+    // Chat Elements
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const chatMessages = document.getElementById('chat-messages');
+    const chatSubmit = document.getElementById('chat-submit');
+    const typingIndicator = document.getElementById('typing-indicator');
+
+    // --- Initialization ---
+    function init() {
+      updateAssetDropdown('Technology');
+      
+      // Event Listeners
+      sectorSelect.addEventListener('change', (e) => updateAssetDropdown(e.target.value));
+      assetSelect.addEventListener('change', (e) => {
+        currentAsset = e.target.value;
+        renderChart();
+        addSystemMessage(`Switched context to ${currentAsset}.`);
+      });
+      
+      timeframeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          timeframeBtns.forEach(b => b.classList.remove('active'));
+          e.target.classList.add('active');
+          currentTimeframe = e.target.dataset.tf;
+          renderChart();
+        });
+      });
+      
+      chatForm.addEventListener('submit', handleChatSubmit);
+      
+      // Initial Render
+      renderChart();
+    }
+
+    function updateAssetDropdown(sector) {
+      const assets = MARKET_SECTORS[sector];
+      assetSelect.innerHTML = assets.map(a => `<option value="${a}">${a}</option>`).join('');
+      currentAsset = assets[0];
+      renderChart();
+    }
+
+    // --- Charting Logic (Simulated Data) ---
+    function generateMockData(days, startPrice, volatility) {
+      const data = { x: [], open: [], high: [], low: [], close: [] };
+      let price = startPrice;
+      let now = new Date();
+      
+      // Adjust interval based on timeframe
+      let intervalMs = 24 * 60 * 60 * 1000; // 1 day
+      let dataPoints = days;
+      
+      if (days === 1) {
+        intervalMs = 5 * 60 * 1000; // 5 min
+        dataPoints = 78; // trading day
+        now.setHours(9, 30, 0, 0); // Start at 9:30 AM
+      } else if (days === 7) {
+        intervalMs = 60 * 60 * 1000; // 1 hour
+        dataPoints = 35; 
+      }
+      
+      let currentTimestamp = now.getTime() - (dataPoints * intervalMs);
+      
+      for (let i = 0; i < dataPoints; i++) {
+        data.x.push(new Date(currentTimestamp).toISOString());
+        
+        let open = price;
+        let change = (Math.random() - 0.5) * volatility;
+        let close = open + change;
+        let high = Math.max(open, close) + (Math.random() * volatility * 0.5);
+        let low = Math.min(open, close) - (Math.random() * volatility * 0.5);
+        
+        data.open.push(open);
+        data.high.push(high);
+        data.low.push(low);
+        data.close.push(close);
+        
+        price = close;
+        currentTimestamp += intervalMs;
+        
+        // Skip weekends for daily charts
+        if (days > 7) {
+          let dayOfWeek = new Date(currentTimestamp).getDay();
+          if (dayOfWeek === 6) currentTimestamp += 2 * intervalMs; // Skip Sat/Sun
+        }
+      }
+      return data;
+    }
+
+    function renderChart() {
+      chartLoading.classList.add('active');
+      
+      // Simulate network delay
+      setTimeout(() => {
+        // Base price determinism based on ticker char code
+        const basePrice = 100 + (currentAsset.charCodeAt(0) * 1.5);
+        const volatility = currentAsset === 'TSLA' || currentAsset === 'NVDA' ? 8 : 3;
+        
+        let days = 1;
+        if (currentTimeframe === '1w') days = 7;
+        if (currentTimeframe === '1m') days = 30;
+        if (currentTimeframe === '3m') days = 90;
+        if (currentTimeframe === '1y') days = 365;
+        if (currentTimeframe === '5y') days = 1825;
+        
+        const data = generateMockData(days, basePrice, volatility);
+        
+        const trace = {
+          x: data.x,
+          close: data.close,
+          high: data.high,
+          low: data.low,
+          open: data.open,
+          decreasing: {line: {color: '#ef4444'}},
+          increasing: {line: {color: '#22c55e'}},
+          line: {color: 'rgba(31,119,180,1)'},
+          type: 'candlestick',
+          xaxis: 'x',
+          yaxis: 'y',
+          name: currentAsset
+        };
+
+        const layout = {
+          title: {
+            text: `${currentAsset} Market Performance`,
+            font: { color: '#2c2a29', family: 'Inter, sans-serif' }
+          },
+          paper_bgcolor: 'transparent',
+          plot_bgcolor: 'transparent',
+          font: { color: '#595553' },
+          xaxis: {
+            rangeslider: { visible: false },
+            gridcolor: 'rgba(44,42,41,0.05)',
+            zerolinecolor: 'rgba(44,42,41,0.05)'
+          },
+          yaxis: {
+            title: 'Price (USD)',
+            gridcolor: 'rgba(44,42,41,0.05)',
+            zerolinecolor: 'rgba(44,42,41,0.05)',
+            tickprefix: '$'
+          },
+          margin: { l: 60, r: 20, t: 60, b: 40 }
+        };
+
+        const config = { responsive: true, displayModeBar: false };
+
+        Plotly.newPlot('plotly-chart', [trace], layout, config);
+        chartLoading.classList.remove('active');
+      }, 400);
+    }
+
+    // --- Chatbot Logic (Simulated AI) ---
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const text = chatInput.value.trim();
+      if (!text) return;
+      
+      // Add user message
+      appendMessage('user', text);
+      chatInput.value = '';
+      chatInput.disabled = true;
+      chatSubmit.disabled = true;
+      
+      // Show typing indicator
+      typingIndicator.classList.add('active');
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      
+      // Simulate AI response delay
+      setTimeout(() => {
+        typingIndicator.classList.remove('active');
+        
+        const info = MOCK_COMPANY_INFO[currentAsset] || `This is a highly liquid stock in the ${sectorSelect.value} sector.`;
+        
+        let response = "";
+        const lowerText = text.toLowerCase();
+        
+        if (lowerText.includes('buy') || lowerText.includes('sell')) {
+          response = `As an AI, I don't provide financial advice. However, looking at the ${currentTimeframe.toUpperCase()} chart for ${currentAsset}, we can observe recent volatility. It's recommended to check RSI and MACD indicators before making a decision.`;
+        } else if (lowerText.includes('summary') || lowerText.includes('what')) {
+          response = `**${currentAsset}**: ${info}`;
+        } else if (lowerText.includes('trend') || lowerText.includes('chart')) {
+          response = `Based on the current ${currentTimeframe.toUpperCase()} timeframe you're viewing, ${currentAsset} is showing typical market behavior for its sector. Ensure you account for broader macroeconomic factors.`;
+        } else {
+          response = `I'm analyzing the data for ${currentAsset}. Based on recent market movements and the company's profile (${info.substring(0, 50)}...), sentiment appears mixed. What specific metrics are you looking for?`;
+        }
+        
+        appendMessage('assistant', response);
+        
+        chatInput.disabled = false;
+        chatSubmit.disabled = false;
+        chatInput.focus();
+      }, 1500);
+    }
+
+    function appendMessage(role, text) {
+      const div = document.createElement('div');
+      div.className = `message ${role}`;
+      // Basic markdown parsing for bold text
+      div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+    
+    function addSystemMessage(text) {
+      const div = document.createElement('div');
+      div.style.textAlign = 'center';
+      div.style.color = 'var(--text-muted)';
+      div.style.fontSize = '0.8rem';
+      div.style.fontStyle = 'italic';
+      div.style.margin = '10px 0';
+      div.innerText = text;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+      
+      // Update welcome message context
+      const firstMsg = chatMessages.querySelector('.message.assistant');
+      if (firstMsg && chatMessages.children.length < 5) {
+        firstMsg.innerHTML = `Hello! I am your AI Market Analyst. I can help you analyze trends, summarize news, or explain the current chart for <strong>${currentAsset}</strong>. What would you like to know?`;
+      }
+    }
+
+    // Start App
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
