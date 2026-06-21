@@ -1058,14 +1058,47 @@
       renderChart();
     }
 
-    // --- Charting Logic (Real Data) ---
+    // --- Charting Logic (Real Data with Mock Fallback) ---
+    function generateMockCandles(ticker) {
+      const snap = getStockSnapshot(ticker);
+      const points = 60;
+      let price = snap.price * 0.85;
+      
+      const data = { x: [], open: [], high: [], low: [], close: [] };
+      const now = new Date();
+      
+      for (let i = points; i >= 0; i--) {
+        const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
+        data.x.push(d.toISOString().split('T')[0]);
+        
+        // Random walk
+        const change = (Math.random() - 0.48) * (price * 0.03);
+        const o = price;
+        const c = price + change;
+        const h = Math.max(o, c) + (Math.random() * price * 0.015);
+        const l = Math.min(o, c) - (Math.random() * price * 0.015);
+        
+        data.open.push(+o.toFixed(2));
+        data.high.push(+h.toFixed(2));
+        data.low.push(+l.toFixed(2));
+        data.close.push(+c.toFixed(2));
+        
+        price = c;
+      }
+      
+      // Force the last point to match the snapshot price
+      data.close[data.close.length - 1] = snap.price;
+      
+      return data;
+    }
+
     async function fetchHistoricalData(ticker, timeframe) {
       try {
         const response = await fetch(`http://127.0.0.1:5000/api/history?ticker=${ticker}&timeframe=${timeframe}`);
         return await response.json();
       } catch (e) {
-        console.error("Error fetching historical data:", e);
-        return { x: [], open: [], high: [], low: [], close: [] };
+        console.warn("Backend API unavailable, falling back to mock data.");
+        return generateMockCandles(ticker);
       }
     }
 
