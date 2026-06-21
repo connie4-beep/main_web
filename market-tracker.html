@@ -1007,8 +1007,9 @@
 
     // State
     let currentAsset = 'AAPL';
-    let currentTimeframe = '1d';
+    let currentTimeframe = '3M';
     window.LIVE_PRICES = {};
+    window.STATIC_STOCK_DATA = null;
     
     // DOM Elements
     const sectorSelect = document.getElementById('sector-select');
@@ -1024,9 +1025,15 @@
     const typingIndicator = document.getElementById('typing-indicator');
 
     // --- Initialization ---
-    function init() {
+    async function init() {
+      try {
+        const res = await fetch('stock_data.json');
+        window.STATIC_STOCK_DATA = await res.json();
+      } catch(e) {
+        console.warn("Could not load static stock data", e);
+      }
+
       updateAssetDropdown('Technology');
-      
       // Event Listeners
       sectorSelect.addEventListener('change', (e) => updateAssetDropdown(e.target.value));
       assetSelect.addEventListener('change', (e) => {
@@ -1062,6 +1069,23 @@
 
     // --- Charting Logic (Real Data with Mock Fallback) ---
     function generateMockCandles(ticker) {
+      if (window.STATIC_STOCK_DATA && window.STATIC_STOCK_DATA[ticker]) {
+        const hist = window.STATIC_STOCK_DATA[ticker].history;
+        let days = 252;
+        if (currentTimeframe === '1D' || currentTimeframe === '1W') days = 7;
+        else if (currentTimeframe === '1M') days = 21;
+        else if (currentTimeframe === '3M') days = 63;
+        else if (currentTimeframe === 'YTD') days = 130;
+        
+        return {
+          x: hist.x.slice(-days),
+          open: hist.open.slice(-days),
+          high: hist.high.slice(-days),
+          low: hist.low.slice(-days),
+          close: hist.close.slice(-days)
+        };
+      }
+      
       const snap = getStockSnapshot(ticker);
       const points = 60;
       let price = snap.price * 0.85;
@@ -1287,6 +1311,9 @@
     function getStockSnapshot(ticker) {
       if (window.LIVE_PRICES && window.LIVE_PRICES[ticker]) {
         return window.LIVE_PRICES[ticker];
+      }
+      if (window.STATIC_STOCK_DATA && window.STATIC_STOCK_DATA[ticker]) {
+        return window.STATIC_STOCK_DATA[ticker].live;
       }
 
       const h = hashTicker(ticker);
