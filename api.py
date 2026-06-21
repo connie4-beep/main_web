@@ -34,7 +34,7 @@ def quote():
 @app.route('/api/history')
 def history():
     ticker = request.args.get('ticker')
-    timeframe = request.args.get('timeframe', '1d')
+    timeframe = request.args.get('timeframe', '1d').lower()
     if not ticker:
         return jsonify({'error': 'Missing ticker'}), 400
         
