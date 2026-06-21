@@ -390,6 +390,381 @@
         height: 500px;
       }
     }
+
+    /* ===== WATCHLIST & PORTFOLIO TRACKER ===== */
+    .tracker-panel {
+      margin-top: 24px;
+    }
+
+    .tracker-tabs {
+      display: flex;
+      gap: 0;
+      border-bottom: 2px solid var(--border-subtle);
+    }
+
+    .tracker-tab {
+      padding: 12px 24px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      position: relative;
+      transition: color 0.2s;
+      font-family: var(--font-body);
+    }
+
+    .tracker-tab:hover { color: var(--text-primary); }
+    .tracker-tab.active { color: var(--text-primary); }
+
+    .tracker-tab.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #22c55e;
+    }
+
+    .tab-content {
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border-card);
+      border-top: none;
+      border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+      padding: 24px;
+      animation: fadeSlideIn 0.3s ease;
+    }
+
+    .tab-content.active { display: block; }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .btn-watchlist {
+      background: linear-gradient(135deg, #22c55e, #10b981);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      align-self: flex-end;
+    }
+
+    .btn-watchlist:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3);
+    }
+
+    .tracker-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .tracker-table thead th {
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .tracker-table tbody tr {
+      transition: background 0.15s;
+    }
+
+    .tracker-table tbody tr:hover {
+      background: rgba(44, 42, 41, 0.03);
+    }
+
+    .tracker-table td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(44, 42, 41, 0.06);
+      vertical-align: middle;
+    }
+
+    .ticker-cell {
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .drag-handle {
+      cursor: grab;
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      user-select: none;
+    }
+
+    .drag-handle:active { cursor: grabbing; }
+
+    .positive { color: #22c55e; font-weight: 600; }
+    .negative { color: #ef4444; font-weight: 600; }
+
+    .sparkline-cell { width: 90px; height: 32px; }
+
+    .btn-remove {
+      background: transparent;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .btn-remove:hover {
+      background: #ef4444;
+      color: #fff;
+      border-color: #ef4444;
+    }
+
+    .tracker-table tbody tr.dragging { opacity: 0.4; }
+    .tracker-table tbody tr.drag-over { border-top: 2px solid #22c55e; }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+      opacity: 0.5;
+    }
+
+    .empty-state p { font-size: 0.95rem; margin: 0; }
+
+    .portfolio-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .summary-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+    }
+
+    .summary-card-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .summary-card-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      font-family: var(--font-heading);
+    }
+
+    .portfolio-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+      margin-bottom: 24px;
+      padding: 16px 20px;
+      background: var(--bg-secondary);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .form-group input {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 9px 14px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      outline: none;
+      width: 120px;
+    }
+
+    .form-group input:focus { border-color: var(--accent-violet); }
+
+    .btn-add-position {
+      background: var(--accent-violet);
+      color: #000;
+      border: none;
+      padding: 9px 20px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-add-position:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(168, 162, 158, 0.3);
+    }
+
+    .portfolio-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .portfolio-chart-wrap {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 16px;
+    }
+
+    .portfolio-chart-wrap h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin: 0 0 12px 0;
+    }
+
+    #allocation-chart { width: 100%; height: 220px; }
+
+    .portfolio-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .btn-export {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-export:hover {
+      border-color: var(--text-primary);
+      background: rgba(44, 42, 41, 0.03);
+    }
+
+    .btn-clear {
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ef4444;
+    }
+
+    .btn-clear:hover {
+      border-color: #ef4444;
+      background: rgba(239, 68, 68, 0.05);
+      color: #ef4444;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: #1a1a1a;
+      color: #fff;
+      padding: 12px 20px;
+      border-radius: var(--radius-md);
+      font-size: 0.9rem;
+      font-weight: 500;
+      z-index: 1000;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s ease;
+      pointer-events: none;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.success { border-left: 3px solid #22c55e; }
+    .toast.error { border-left: 3px solid #ef4444; }
+    .toast.info { border-left: 3px solid var(--accent-violet); }
+
+    .tracker-tabs-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--border-subtle);
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding-right: 12px;
+    }
+
+    .live-dot {
+      width: 8px;
+      height: 8px;
+      background: #22c55e;
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+      50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+    }
+
+    @media (max-width: 992px) {
+      .portfolio-summary { grid-template-columns: 1fr; }
+      .portfolio-bottom { grid-template-columns: 1fr; }
+      .portfolio-form { flex-direction: column; }
+      .form-group input { width: 100%; }
+    }
   </style>
 </head>
 <body>
@@ -435,6 +810,10 @@
           <button class="timeframe-btn" data-tf="5y">5Y</button>
         </div>
       </div>
+
+      <button class="btn-watchlist" onclick="addToWatchlist()" id="btn-add-watchlist">
+        + Watchlist
+      </button>
     </div>
 
     <!-- Split View -->
@@ -484,6 +863,121 @@
       </div>
 
     </div>
+
+    <!-- Watchlist & Portfolio Tracker -->
+    <div class="tracker-panel">
+      <div class="tracker-tabs-bar">
+        <div class="tracker-tabs">
+          <button class="tracker-tab active" onclick="switchTab('watchlist')">
+            📋 Watchlist
+          </button>
+          <button class="tracker-tab" onclick="switchTab('portfolio')">
+            💼 Portfolio
+          </button>
+        </div>
+        <div class="live-indicator">
+          <span class="live-dot"></span>
+          <span id="live-timestamp">Live</span>
+        </div>
+      </div>
+
+      <!-- Watchlist Tab -->
+      <div class="tab-content active" id="tab-watchlist">
+        <table class="tracker-table" id="watchlist-table">
+          <thead>
+            <tr>
+              <th style="width:32px"></th>
+              <th>Ticker</th>
+              <th>Price</th>
+              <th>Change</th>
+              <th>%</th>
+              <th>Trend</th>
+              <th style="width:40px"></th>
+            </tr>
+          </thead>
+          <tbody id="watchlist-body"></tbody>
+        </table>
+        <div class="empty-state" id="watchlist-empty">
+          <div class="empty-state-icon">📋</div>
+          <p>Your watchlist is empty. Select a stock above and click <strong>+ Watchlist</strong> to start tracking.</p>
+        </div>
+      </div>
+
+      <!-- Portfolio Tab -->
+      <div class="tab-content" id="tab-portfolio">
+        <div class="portfolio-summary" id="portfolio-summary">
+          <div class="summary-card">
+            <div class="summary-card-label">Total Value</div>
+            <div class="summary-card-value" id="total-value">$0.00</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-label">Total P&amp;L</div>
+            <div class="summary-card-value" id="total-pnl">$0.00</div>
+          </div>
+          <div class="summary-card">
+            <div class="summary-card-label">Holdings</div>
+            <div class="summary-card-value" id="total-holdings">0</div>
+          </div>
+        </div>
+
+        <form class="portfolio-form" id="portfolio-form" onsubmit="event.preventDefault(); addPosition();">
+          <div class="form-group">
+            <label for="pos-ticker">Ticker</label>
+            <input type="text" id="pos-ticker" placeholder="AAPL" />
+          </div>
+          <div class="form-group">
+            <label for="pos-shares">Shares</label>
+            <input type="number" id="pos-shares" placeholder="10" min="1" step="1" />
+          </div>
+          <div class="form-group">
+            <label for="pos-cost">Avg Cost ($)</label>
+            <input type="number" id="pos-cost" placeholder="150.00" min="0.01" step="0.01" />
+          </div>
+          <button type="submit" class="btn-add-position">+ Add Position</button>
+        </form>
+
+        <table class="tracker-table" id="portfolio-table">
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Shares</th>
+              <th>Avg Cost</th>
+              <th>Price</th>
+              <th>Mkt Value</th>
+              <th>P&amp;L ($)</th>
+              <th>P&amp;L (%)</th>
+              <th style="width:40px"></th>
+            </tr>
+          </thead>
+          <tbody id="portfolio-body"></tbody>
+        </table>
+        <div class="empty-state" id="portfolio-empty">
+          <div class="empty-state-icon">💼</div>
+          <p>No positions yet. Add your first holding above to start tracking your portfolio.</p>
+        </div>
+
+        <div class="portfolio-bottom" id="portfolio-bottom" style="display: none;">
+          <div class="portfolio-chart-wrap">
+            <h4>Allocation</h4>
+            <div id="allocation-chart"></div>
+          </div>
+          <div class="portfolio-actions">
+            <button class="btn-export" onclick="exportCSV()">
+              📥 Export to CSV
+            </button>
+            <button class="btn-export btn-clear" onclick="clearPortfolio()">
+              🗑 Clear All
+            </button>
+            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">
+              Download your portfolio or reset all data.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
   </main>
 
   <script>
@@ -502,9 +996,17 @@
       'TSLA': 'Tesla, Inc. designs, develops, manufactures, leases, and sells electric vehicles, and energy generation and storage systems. Recent volatility is tied to margins and FSD timeline updates.'
     };
 
+    const KNOWN_PRICES = {
+      'AAPL': 198, 'MSFT': 415, 'NVDA': 875, 'GOOGL': 172, 'META': 485, 'AMD': 158,
+      'TSLA': 248, 'AMZN': 186, 'JPM': 198, 'V': 279, 'MA': 458, 'BAC': 39,
+      'LLY': 780, 'UNH': 520, 'JNJ': 155, 'MRK': 126, 'ABBV': 170, 'PFE': 28,
+      'HD': 345, 'MCD': 275, 'NKE': 92, 'SBUX': 88, 'WFC': 60, 'GS': 420
+    };
+
     // State
     let currentAsset = 'AAPL';
     let currentTimeframe = '1d';
+    window.LIVE_PRICES = {};
     
     // DOM Elements
     const sectorSelect = document.getElementById('sector-select');
@@ -544,6 +1046,9 @@
       
       // Initial Render
       renderChart();
+
+      // Initialize Watchlist & Portfolio Tracker
+      initTrackerPanel();
     }
 
     function updateAssetDropdown(sector) {
@@ -553,70 +1058,26 @@
       renderChart();
     }
 
-    // --- Charting Logic (Simulated Data) ---
-    function generateMockData(days, startPrice, volatility) {
-      const data = { x: [], open: [], high: [], low: [], close: [] };
-      let price = startPrice;
-      let now = new Date();
-      
-      // Adjust interval based on timeframe
-      let intervalMs = 24 * 60 * 60 * 1000; // 1 day
-      let dataPoints = days;
-      
-      if (days === 1) {
-        intervalMs = 5 * 60 * 1000; // 5 min
-        dataPoints = 78; // trading day
-        now.setHours(9, 30, 0, 0); // Start at 9:30 AM
-      } else if (days === 7) {
-        intervalMs = 60 * 60 * 1000; // 1 hour
-        dataPoints = 35; 
+    // --- Charting Logic (Real Data) ---
+    async function fetchHistoricalData(ticker, timeframe) {
+      try {
+        const response = await fetch(`http://127.0.0.1:5000/api/history?ticker=${ticker}&timeframe=${timeframe}`);
+        return await response.json();
+      } catch (e) {
+        console.error("Error fetching historical data:", e);
+        return { x: [], open: [], high: [], low: [], close: [] };
       }
-      
-      let currentTimestamp = now.getTime() - (dataPoints * intervalMs);
-      
-      for (let i = 0; i < dataPoints; i++) {
-        data.x.push(new Date(currentTimestamp).toISOString());
-        
-        let open = price;
-        let change = (Math.random() - 0.5) * volatility;
-        let close = open + change;
-        let high = Math.max(open, close) + (Math.random() * volatility * 0.5);
-        let low = Math.min(open, close) - (Math.random() * volatility * 0.5);
-        
-        data.open.push(open);
-        data.high.push(high);
-        data.low.push(low);
-        data.close.push(close);
-        
-        price = close;
-        currentTimestamp += intervalMs;
-        
-        // Skip weekends for daily charts
-        if (days > 7) {
-          let dayOfWeek = new Date(currentTimestamp).getDay();
-          if (dayOfWeek === 6) currentTimestamp += 2 * intervalMs; // Skip Sat/Sun
-        }
-      }
-      return data;
     }
 
-    function renderChart() {
+    async function renderChart() {
       chartLoading.classList.add('active');
       
-      // Simulate network delay
-      setTimeout(() => {
-        // Base price determinism based on ticker char code
-        const basePrice = 100 + (currentAsset.charCodeAt(0) * 1.5);
-        const volatility = currentAsset === 'TSLA' || currentAsset === 'NVDA' ? 8 : 3;
-        
-        let days = 1;
-        if (currentTimeframe === '1w') days = 7;
-        if (currentTimeframe === '1m') days = 30;
-        if (currentTimeframe === '3m') days = 90;
-        if (currentTimeframe === '1y') days = 365;
-        if (currentTimeframe === '5y') days = 1825;
-        
-        const data = generateMockData(days, basePrice, volatility);
+      const data = await fetchHistoricalData(currentAsset, currentTimeframe);
+      
+      if (!data || !data.x) {
+        chartLoading.classList.remove('active');
+        return;
+      }
         
         const trace = {
           x: data.x,
@@ -659,42 +1120,53 @@
 
         Plotly.newPlot('plotly-chart', [trace], layout, config);
         chartLoading.classList.remove('active');
-      }, 400);
     }
 
-    // --- Chatbot Logic (Simulated AI) ---
+    // --- Chatbot Logic (Smart Client-Side Mock) ---
     function handleChatSubmit(e) {
       e.preventDefault();
       const text = chatInput.value.trim();
       if (!text) return;
       
-      // Add user message
       appendMessage('user', text);
       chatInput.value = '';
       chatInput.disabled = true;
       chatSubmit.disabled = true;
       
-      // Show typing indicator
       typingIndicator.classList.add('active');
       chatMessages.scrollTop = chatMessages.scrollHeight;
       
-      // Simulate AI response delay
       setTimeout(() => {
         typingIndicator.classList.remove('active');
-        
-        const info = MOCK_COMPANY_INFO[currentAsset] || `This is a highly liquid stock in the ${sectorSelect.value} sector.`;
         
         let response = "";
         const lowerText = text.toLowerCase();
         
-        if (lowerText.includes('buy') || lowerText.includes('sell')) {
-          response = `As an AI, I don't provide financial advice. However, looking at the ${currentTimeframe.toUpperCase()} chart for ${currentAsset}, we can observe recent volatility. It's recommended to check RSI and MACD indicators before making a decision.`;
-        } else if (lowerText.includes('summary') || lowerText.includes('what')) {
-          response = `**${currentAsset}**: ${info}`;
-        } else if (lowerText.includes('trend') || lowerText.includes('chart')) {
-          response = `Based on the current ${currentTimeframe.toUpperCase()} timeframe you're viewing, ${currentAsset} is showing typical market behavior for its sector. Ensure you account for broader macroeconomic factors.`;
+        // Context
+        const snap = getStockSnapshot(currentAsset);
+        const holdPos = portfolio.find(p => p.ticker === currentAsset);
+        const sharesHeld = holdPos ? holdPos.shares : 0;
+        const costBasis = holdPos ? holdPos.avgCost : 0;
+        const mktVal = holdPos ? (snap.price * sharesHeld) : 0;
+        const pnl = holdPos ? (mktVal - (costBasis * sharesHeld)) : 0;
+        const pnlPct = costBasis > 0 ? (pnl / (costBasis * sharesHeld) * 100).toFixed(1) : 0;
+
+        // Intent Parser
+        if (lowerText.includes('portfolio') || lowerText.includes('hold') || lowerText.includes('own') || lowerText.includes('how much') || lowerText.includes('my position')) {
+           if (sharesHeld > 0) {
+              response = `You currently hold **${sharesHeld} shares** of ${currentAsset} at an average cost of $${costBasis.toFixed(2)}. Your position is worth **$${mktVal.toFixed(2)}**, which is a P&L of **$${pnl.toFixed(2)} (${pnl >= 0 ? '+' : ''}${pnlPct}%)**.`;
+           } else {
+              response = `You don't currently hold any shares of ${currentAsset} in your portfolio. You can add a position using the Portfolio tab below!`;
+           }
+        } else if (lowerText.includes('price') || lowerText.includes('quote') || lowerText.includes('current')) {
+           response = `The current market price for ${currentAsset} is **$${snap.price.toFixed(2)}**, which is ${snap.change >= 0 ? 'up' : 'down'} ${snap.changePercent}% today.`;
+        } else if (lowerText.includes('buy') || lowerText.includes('sell') || lowerText.includes('advice')) {
+           response = `As an AI, I don't provide financial advice. However, based on your portfolio${sharesHeld > 0 ? ` (where you are ${pnl >= 0 ? 'up' : 'down'} on ${currentAsset})` : ''}, I recommend checking the ${currentTimeframe.toUpperCase()} chart for recent volatility trends before making a decision.`;
+        } else if (lowerText.includes('summary') || lowerText.includes('what is')) {
+           const info = MOCK_COMPANY_INFO[currentAsset] || `This is a highly liquid stock in the ${sectorSelect.value} sector.`;
+           response = `**${currentAsset}**: ${info}`;
         } else {
-          response = `I'm analyzing the data for ${currentAsset}. Based on recent market movements and the company's profile (${info.substring(0, 50)}...), sentiment appears mixed. What specific metrics are you looking for?`;
+           response = `I'm tracking the live data for ${currentAsset}. The current price is $${snap.price.toFixed(2)}. You can ask me things like "How much AAPL do I hold?" or "What is the price of NVDA?".`;
         }
         
         appendMessage('assistant', response);
@@ -702,7 +1174,7 @@
         chatInput.disabled = false;
         chatSubmit.disabled = false;
         chatInput.focus();
-      }, 1500);
+      }, 1000);
     }
 
     function appendMessage(role, text) {
@@ -732,8 +1204,515 @@
       }
     }
 
+    // ===== WATCHLIST & PORTFOLIO TRACKER =====
+
+    // --- State ---
+    let watchlist = [];
+    let portfolio = [];
+    let priceTick = 0;
+
+    // --- Persistence (localStorage) ---
+    const WL_KEY = 'market-tracker-watchlist';
+    const PF_KEY = 'market-tracker-portfolio';
+
+    function saveWatchlist() {
+      localStorage.setItem(WL_KEY, JSON.stringify(watchlist));
+    }
+    function loadWatchlist() {
+      try {
+        const data = localStorage.getItem(WL_KEY);
+        watchlist = data ? JSON.parse(data) : [];
+      } catch (e) { watchlist = []; }
+    }
+    function savePortfolio() {
+      localStorage.setItem(PF_KEY, JSON.stringify(portfolio));
+    }
+    function loadPortfolio() {
+      try {
+        const data = localStorage.getItem(PF_KEY);
+        portfolio = data ? JSON.parse(data) : [];
+      } catch (e) { portfolio = []; }
+    }
+
+    // --- Mock Data Helpers ---
+    function hashTicker(ticker) {
+      let hash = 5381;
+      for (let i = 0; i < ticker.length; i++) {
+        hash = ((hash << 5) + hash) + ticker.charCodeAt(i);
+      }
+      return Math.abs(hash);
+    }
+
+    function getStockSnapshot(ticker) {
+      if (window.LIVE_PRICES && window.LIVE_PRICES[ticker]) {
+        return window.LIVE_PRICES[ticker];
+      }
+
+      const h = hashTicker(ticker);
+      // Use realistic known prices
+      const basePrice = KNOWN_PRICES[ticker] || (100 + (ticker.charCodeAt(0) * 1.5));
+      // Daily seed
+      const today = new Date().toDateString();
+      let dayHash = 0;
+      for (let i = 0; i < today.length; i++) {
+        dayHash = ((dayHash << 5) - dayHash) + today.charCodeAt(i);
+      }
+      const combined = Math.abs(h ^ dayHash);
+      const dailyChange = ((combined % 600) - 280) / 100;
+      const change = basePrice * dailyChange / 100;
+      const price = basePrice + change;
+      return {
+        price: +price.toFixed(2),
+        change: +change.toFixed(2),
+        changePercent: +dailyChange.toFixed(2)
+      };
+    }
+
+    function generateSparklineData(ticker) {
+      const h = hashTicker(ticker);
+      const snap = getStockSnapshot(ticker);
+      const points = [];
+      let price = snap.price * 0.97;
+      for (let i = 0; i < 20; i++) {
+        const seed = Math.abs((h * (i + 1) * 7919 + i * 31) % 10000);
+        const delta = ((seed % 100) - 47) / 100 * (snap.price * 0.015);
+        price = Math.max(price + delta, snap.price * 0.9);
+        points.push(+price.toFixed(2));
+      }
+      points[points.length - 1] = snap.price;
+      return points;
+    }
+
+    // --- Toast Notifications ---
+    function showToast(message, type) {
+      type = type || 'info';
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = 'toast ' + type + ' show';
+      setTimeout(function() {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+
+    // --- Tab Switching ---
+    function switchTab(tabName) {
+      document.querySelectorAll('.tracker-tab').forEach(function(t) { t.classList.remove('active'); });
+      document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+
+      var tabs = document.querySelectorAll('.tracker-tab');
+      tabs.forEach(function(t) {
+        if (t.getAttribute('onclick').indexOf(tabName) !== -1) t.classList.add('active');
+      });
+      var content = document.getElementById('tab-' + tabName);
+      if (content) content.classList.add('active');
+    }
+
+    // --- Watchlist ---
+    function addToWatchlist() {
+      if (watchlist.indexOf(currentAsset) !== -1) {
+        showToast(currentAsset + ' is already in your watchlist', 'error');
+        return;
+      }
+      watchlist.push(currentAsset);
+      saveWatchlist();
+      renderWatchlist();
+      showToast(currentAsset + ' added to watchlist', 'success');
+    }
+
+    function removeFromWatchlist(ticker) {
+      watchlist = watchlist.filter(function(t) { return t !== ticker; });
+      saveWatchlist();
+      renderWatchlist();
+      showToast(ticker + ' removed', 'info');
+    }
+
+    function renderWatchlist() {
+      var tbody = document.getElementById('watchlist-body');
+      var emptyState = document.getElementById('watchlist-empty');
+      var table = document.getElementById('watchlist-table');
+
+      if (watchlist.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.style.display = 'block';
+        table.style.display = 'none';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      table.style.display = 'table';
+      tbody.innerHTML = watchlist.map(function(ticker, idx) {
+        var snap = getStockSnapshot(ticker);
+        var isPos = snap.change >= 0;
+        var cls = isPos ? 'positive' : 'negative';
+        var arrow = isPos ? '▲' : '▼';
+        var sign = isPos ? '+' : '';
+
+        return '<tr draggable="true" data-idx="' + idx + '" data-ticker="' + ticker + '">' +
+          '<td><span class="drag-handle">⠿</span></td>' +
+          '<td><span class="ticker-cell">' + ticker + '</span></td>' +
+          '<td>$' + snap.price.toFixed(2) + '</td>' +
+          '<td class="' + cls + '">' + sign + snap.change.toFixed(2) + '</td>' +
+          '<td class="' + cls + '">' + arrow + ' ' + sign + snap.changePercent.toFixed(2) + '%</td>' +
+          '<td><div class="sparkline-cell" id="spark-' + ticker + '"></div></td>' +
+          '<td><button class="btn-remove" onclick="removeFromWatchlist(\'' + ticker + '\')" title="Remove">✕</button></td>' +
+          '</tr>';
+      }).join('');
+
+      // Render sparklines after DOM update
+      requestAnimationFrame(function() {
+        watchlist.forEach(function(ticker) {
+          renderSparkline('spark-' + ticker, generateSparklineData(ticker), getStockSnapshot(ticker).change >= 0);
+        });
+        setupDragAndDrop();
+      });
+    }
+
+    function renderSparkline(containerId, data, isPositive) {
+      var el = document.getElementById(containerId);
+      if (!el) return;
+
+      var color = isPositive ? '#22c55e' : '#ef4444';
+      var fillColor = isPositive ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)';
+
+      Plotly.newPlot(containerId, [{
+        y: data,
+        type: 'scatter',
+        mode: 'lines',
+        line: { color: color, width: 1.5 },
+        fill: 'tozeroy',
+        fillcolor: fillColor
+      }], {
+        margin: { l: 0, r: 0, t: 0, b: 0 },
+        xaxis: { visible: false, fixedrange: true },
+        yaxis: { visible: false, fixedrange: true },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        showlegend: false,
+        hovermode: false
+      }, {
+        responsive: true,
+        displayModeBar: false,
+        staticPlot: true
+      });
+    }
+
+    // --- Drag & Drop ---
+    function setupDragAndDrop() {
+      var tbody = document.getElementById('watchlist-body');
+      var rows = tbody.querySelectorAll('tr');
+      var draggedIdx = null;
+
+      rows.forEach(function(row) {
+        row.addEventListener('dragstart', function(e) {
+          draggedIdx = parseInt(row.dataset.idx);
+          row.classList.add('dragging');
+          e.dataTransfer.effectAllowed = 'move';
+        });
+
+        row.addEventListener('dragend', function() {
+          row.classList.remove('dragging');
+          rows.forEach(function(r) { r.classList.remove('drag-over'); });
+        });
+
+        row.addEventListener('dragover', function(e) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          row.classList.add('drag-over');
+        });
+
+        row.addEventListener('dragleave', function() {
+          row.classList.remove('drag-over');
+        });
+
+        row.addEventListener('drop', function(e) {
+          e.preventDefault();
+          var targetIdx = parseInt(row.dataset.idx);
+          if (draggedIdx !== null && draggedIdx !== targetIdx) {
+            var moved = watchlist.splice(draggedIdx, 1)[0];
+            watchlist.splice(targetIdx, 0, moved);
+            saveWatchlist();
+            renderWatchlist();
+          }
+          rows.forEach(function(r) { r.classList.remove('drag-over'); });
+        });
+      });
+    }
+
+    // --- Portfolio ---
+    function addPosition() {
+      var tickerInput = document.getElementById('pos-ticker');
+      var sharesInput = document.getElementById('pos-shares');
+      var costInput = document.getElementById('pos-cost');
+
+      var ticker = tickerInput.value.trim().toUpperCase();
+      var shares = parseFloat(sharesInput.value);
+      var avgCost = parseFloat(costInput.value);
+
+      if (!ticker) { showToast('Enter a ticker symbol', 'error'); return; }
+      if (!shares || shares <= 0) { showToast('Enter a valid number of shares', 'error'); return; }
+      if (!avgCost || avgCost <= 0) { showToast('Enter a valid average cost', 'error'); return; }
+
+      // Check for duplicate — average into existing position
+      var existing = portfolio.find(function(p) { return p.ticker === ticker; });
+      if (existing) {
+        var totalShares = existing.shares + shares;
+        existing.avgCost = ((existing.shares * existing.avgCost) + (shares * avgCost)) / totalShares;
+        existing.shares = totalShares;
+        existing.avgCost = +existing.avgCost.toFixed(2);
+        showToast('Averaged into ' + ticker + ' (' + totalShares + ' shares)', 'success');
+      } else {
+        portfolio.push({ ticker: ticker, shares: shares, avgCost: avgCost });
+        showToast('Added ' + shares + ' shares of ' + ticker, 'success');
+      }
+
+      savePortfolio();
+      renderPortfolio();
+
+      tickerInput.value = currentAsset;
+      sharesInput.value = '';
+      costInput.value = '';
+    }
+
+    function removePosition(ticker) {
+      portfolio = portfolio.filter(function(p) { return p.ticker !== ticker; });
+      savePortfolio();
+      renderPortfolio();
+      showToast(ticker + ' removed from portfolio', 'info');
+    }
+
+    function renderPortfolio() {
+      var tbody = document.getElementById('portfolio-body');
+      var emptyState = document.getElementById('portfolio-empty');
+      var bottomSection = document.getElementById('portfolio-bottom');
+      var table = document.getElementById('portfolio-table');
+
+      if (portfolio.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.style.display = 'block';
+        bottomSection.style.display = 'none';
+        table.style.display = 'none';
+        renderPortfolioSummary(0, 0, 0);
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      bottomSection.style.display = 'grid';
+      table.style.display = 'table';
+
+      var totalValue = 0;
+      var totalCost = 0;
+
+      tbody.innerHTML = portfolio.map(function(pos) {
+        var snap = getStockSnapshot(pos.ticker);
+        var mktValue = snap.price * pos.shares;
+        var costBasis = pos.avgCost * pos.shares;
+        var pnl = mktValue - costBasis;
+        var pnlPercent = (pnl / costBasis) * 100;
+        var isPos = pnl >= 0;
+        var cls = isPos ? 'positive' : 'negative';
+        var sign = isPos ? '+' : '';
+
+        totalValue += mktValue;
+        totalCost += costBasis;
+
+        return '<tr>' +
+          '<td><span class="ticker-cell">' + pos.ticker + '</span></td>' +
+          '<td>' + pos.shares + '</td>' +
+          '<td>$' + pos.avgCost.toFixed(2) + '</td>' +
+          '<td>$' + snap.price.toFixed(2) + '</td>' +
+          '<td>$' + mktValue.toFixed(2) + '</td>' +
+          '<td class="' + cls + '">' + sign + '$' + pnl.toFixed(2) + '</td>' +
+          '<td class="' + cls + '">' + sign + pnlPercent.toFixed(2) + '%</td>' +
+          '<td><button class="btn-remove" onclick="removePosition(\'' + pos.ticker + '\')" title="Remove">✕</button></td>' +
+          '</tr>';
+      }).join('');
+
+      var totalPnl = totalValue - totalCost;
+      renderPortfolioSummary(totalValue, totalPnl, portfolio.length);
+      renderAllocationChart(totalValue);
+    }
+
+    function renderPortfolioSummary(totalValue, totalPnl, holdings) {
+      document.getElementById('total-value').textContent = '$' + totalValue.toFixed(2);
+
+      var pnlEl = document.getElementById('total-pnl');
+      var isPos = totalPnl >= 0;
+      var sign = isPos ? '+' : '';
+      var pnlPercent = totalValue > 0 ? ((totalPnl / (totalValue - totalPnl)) * 100) : 0;
+      pnlEl.className = 'summary-card-value ' + (isPos ? 'positive' : (totalPnl < 0 ? 'negative' : ''));
+
+      if (totalValue > 0) {
+        pnlEl.innerHTML = sign + '$' + totalPnl.toFixed(2) +
+          ' <span style="font-size:0.8rem;opacity:0.7">(' + sign + pnlPercent.toFixed(1) + '%)</span>';
+      } else {
+        pnlEl.textContent = '$0.00';
+      }
+
+      document.getElementById('total-holdings').textContent = holdings;
+    }
+
+    function renderAllocationChart(totalValue) {
+      if (portfolio.length === 0 || totalValue === 0) return;
+
+      var PALETTE = ['#a78bfa', '#34d399', '#fbbf24', '#f87171', '#38bdf8', '#fb923c', '#a3e635', '#e879f9'];
+
+      var labels = portfolio.map(function(p) { return p.ticker; });
+      var values = portfolio.map(function(p) {
+        var snap = getStockSnapshot(p.ticker);
+        return snap.price * p.shares;
+      });
+
+      Plotly.newPlot('allocation-chart', [{
+        labels: labels,
+        values: values,
+        type: 'pie',
+        hole: 0.55,
+        textinfo: 'label+percent',
+        textfont: { size: 11, family: 'Inter, sans-serif' },
+        marker: { colors: PALETTE.slice(0, labels.length) },
+        hoverinfo: 'label+value+percent',
+        hovertemplate: '<b>%{label}</b><br>$%{value:,.2f}<br>%{percent}<extra></extra>'
+      }], {
+        margin: { l: 10, r: 10, t: 10, b: 10 },
+        paper_bgcolor: 'transparent',
+        plot_bgcolor: 'transparent',
+        showlegend: false,
+        font: { color: '#595553' }
+      }, {
+        responsive: true,
+        displayModeBar: false
+      });
+    }
+
+    // --- CSV Export ---
+    function exportCSV() {
+      if (portfolio.length === 0) {
+        showToast('No positions to export', 'error');
+        return;
+      }
+
+      var headers = ['Ticker', 'Shares', 'Avg Cost', 'Current Price', 'Market Value', 'P&L ($)', 'P&L (%)'];
+      var rows = portfolio.map(function(pos) {
+        var snap = getStockSnapshot(pos.ticker);
+        var mktValue = snap.price * pos.shares;
+        var costBasis = pos.avgCost * pos.shares;
+        var pnl = mktValue - costBasis;
+        var pnlPercent = (pnl / costBasis) * 100;
+        return [pos.ticker, pos.shares, pos.avgCost.toFixed(2), snap.price.toFixed(2), mktValue.toFixed(2), pnl.toFixed(2), pnlPercent.toFixed(2) + '%'];
+      });
+
+      var csvContent = [headers].concat(rows).map(function(r) { return r.join(','); }).join('\n');
+      var blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = 'portfolio_' + new Date().toISOString().slice(0, 10) + '.csv';
+      a.click();
+      URL.revokeObjectURL(url);
+
+      showToast('Portfolio exported!', 'success');
+    }
+
+    // --- Clear All Data ---
+    function clearPortfolio() {
+      if (!confirm('Clear all watchlist and portfolio data?')) return;
+      watchlist = [];
+      portfolio = [];
+      saveWatchlist();
+      savePortfolio();
+      renderWatchlist();
+      renderPortfolio();
+      showToast('All data cleared', 'info');
+    }
+
+    // --- Tracker Panel Init ---
+    function initTrackerPanel() {
+      loadWatchlist();
+      loadPortfolio();
+      renderWatchlist();
+      renderPortfolio();
+
+      // Pre-fill portfolio ticker with current asset
+      document.getElementById('pos-ticker').value = currentAsset;
+
+      // Keep portfolio ticker in sync when asset changes
+      assetSelect.addEventListener('change', function() {
+        setTimeout(function() {
+          document.getElementById('pos-ticker').value = currentAsset;
+        }, 0);
+      });
+
+      // Live price refresh every 10 seconds
+      async function refreshPrices() {
+        const tickers = new Set([currentAsset]);
+        watchlist.forEach(t => tickers.add(t));
+        portfolio.forEach(p => tickers.add(p.ticker));
+
+        for (const ticker of tickers) {
+          try {
+            const res = await fetch(`http://127.0.0.1:5000/api/quote?ticker=${ticker}`);
+            const data = await res.json();
+            if (!data.error) {
+              window.LIVE_PRICES[ticker] = {
+                price: data.price,
+                change: data.change,
+                changePercent: data.changePercent
+              };
+            }
+          } catch(e) { console.error("Error fetching live price for " + ticker, e); }
+        }
+
+        priceTick++;
+        if (watchlist.length > 0) renderWatchlist();
+        if (portfolio.length > 0) renderPortfolio();
+        
+        var now = new Date();
+        var timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        document.getElementById('live-timestamp').textContent = 'Updated ' + timeStr;
+      }
+
+      refreshPrices();
+      setInterval(refreshPrices, 10000);
+    }
+
     // Start App
     document.addEventListener('DOMContentLoaded', init);
+  </script>
+
+  <!-- Custom Greninja Cursor -->
+  <div id="greninja-cursor" class="greninja-cursor">
+    <img src="greninja.gif" alt="Greninja Cursor" width="64" height="64" />
+  </div>
+
+  <script>
+    // --- Custom Greninja Cursor ---
+    const greninjaCursor = document.getElementById('greninja-cursor');
+    if (greninjaCursor) {
+      let mouseX = 0;
+      let mouseY = 0;
+      let isMoving = false;
+
+      window.addEventListener('mousemove', (e) => {
+        // Hide cursor if hovering over a Plotly chart to avoid blocking data
+        if (e.target.closest('.js-plotly-plot') || e.target.closest('.plotly')) {
+          greninjaCursor.style.display = 'none';
+          return;
+        } else {
+          greninjaCursor.style.display = 'block';
+        }
+
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+        
+        if (!isMoving) {
+          isMoving = true;
+          window.requestAnimationFrame(() => {
+            greninjaCursor.style.transform = `translate3d(${mouseX + 15}px, ${mouseY + 15}px, 0)`;
+            isMoving = false;
+          });
+        }
+      });
+    }
   </script>
 </body>
 </html>

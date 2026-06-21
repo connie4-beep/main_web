@@ -912,3 +912,18 @@ body {
     padding: var(--space-lg);
   }
 }
+
+/* Custom Greninja Cursor */
+.greninja-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 64px;
+  height: 64px;
+  background-image: url('greninja.gif');
+  background-size: contain;
+  background-repeat: no-repeat;
+  pointer-events: none; /* Let clicks pass through to the page */
+  z-index: 99999;
+  transform: translate(-50%, -50%); /* Center it on the cursor */
+}
