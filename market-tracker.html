@@ -986,7 +986,7 @@
       'Technology': ['AAPL', 'MSFT', 'NVDA', 'GOOGL', 'META', 'AMD'],
       'Healthcare': ['LLY', 'UNH', 'JNJ', 'MRK', 'ABBV', 'PFE'],
       'Finance': ['JPM', 'V', 'MA', 'BAC', 'WFC', 'GS'],
-      'Consumer': ['AMZN', 'TSLA', 'HD', 'MCD', 'NKE', 'SBUX']
+      'Consumer': ['AMZN', 'TSLA', 'HD', 'MCD', 'WMT', 'COST']
     };
 
     const MOCK_COMPANY_INFO = {
@@ -996,13 +996,15 @@
       'TSLA': 'Tesla, Inc. designs, develops, manufactures, leases, and sells electric vehicles, and energy generation and storage systems. Recent volatility is tied to margins and FSD timeline updates.'
     };
 
+    // Fallback prices (used only if stock_data.json fails to load)
+    // These should match the latest stock_data.json live prices
     const KNOWN_PRICES = {
-      'AAPL': 214, 'MSFT': 445, 'NVDA': 130, 'GOOGL': 176, 'META': 500, 'AMD': 160,
-      'JPM': 195, 'V': 275, 'MA': 450, 'BAC': 39, 'WFC': 58, 'GS': 450,
-      'JNJ': 146, 'UNH': 485, 'LLY': 880, 'ABBV': 168, 'MRK': 128, 'PFE': 28,
-      'AMZN': 185, 'TSLA': 182, 'WMT': 68, 'HD': 335, 'COST': 850, 'MCD': 255,
-      'XOM': 110, 'CVX': 153, 'COP': 113, 'SLB': 45, 'EOG': 120, 'PXD': 260,
-      'BA': 175, 'CAT': 325, 'HON': 212, 'UNP': 225, 'GE': 160, 'MMM': 100
+      'AAPL': 298.01, 'MSFT': 379.40, 'NVDA': 210.69, 'GOOGL': 368.03, 'META': 577.22, 'AMD': 537.37,
+      'JPM': 325.22, 'V': 327.24, 'MA': 489.79, 'BAC': 56.20, 'WFC': 82.20, 'GS': 1096.56,
+      'JNJ': 228.39, 'UNH': 400.96, 'LLY': 1098.57, 'ABBV': 216.49, 'MRK': 113.87, 'PFE': 25.21,
+      'AMZN': 244.39, 'TSLA': 400.49, 'WMT': 117.18, 'HD': 334.28, 'COST': 951.45, 'MCD': 278.61,
+      'XOM': 137.81, 'CVX': 173.63, 'COP': 107.74, 'SLB': 48.09, 'EOG': 129.98, 'OXY': 51.82,
+      'BA': 222.72, 'CAT': 985.82, 'HON': 229.01, 'UNP': 256.88, 'GE': 357.64, 'MMM': 160.60
     };
 
     // State
@@ -1067,15 +1069,22 @@
       renderChart();
     }
 
-    // --- Charting Logic (Real Data with Mock Fallback) ---
-    function generateMockCandles(ticker) {
+    // --- Charting Logic (Static JSON Data with API Fallback) ---
+    function getStaticCandles(ticker) {
       if (window.STATIC_STOCK_DATA && window.STATIC_STOCK_DATA[ticker]) {
         const hist = window.STATIC_STOCK_DATA[ticker].history;
-        let days = 252;
-        if (currentTimeframe === '1D' || currentTimeframe === '1W') days = 7;
-        else if (currentTimeframe === '1M') days = 21;
-        else if (currentTimeframe === '3M') days = 63;
-        else if (currentTimeframe === 'YTD') days = 130;
+        const tf = currentTimeframe.toUpperCase();
+        let days;
+        if (tf === '1D') days = 1;
+        else if (tf === '1W') days = 5;
+        else if (tf === '1M') days = 21;
+        else if (tf === '3M') days = 63;
+        else if (tf === '1Y') days = 252;
+        else if (tf === '5Y') days = hist.x.length; // use all available data
+        else days = hist.x.length;
+        
+        // Clamp to available data
+        days = Math.min(days, hist.x.length);
         
         return {
           x: hist.x.slice(-days),
@@ -1085,52 +1094,22 @@
           close: hist.close.slice(-days)
         };
       }
-      
-      const snap = getStockSnapshot(ticker);
-      const points = 60;
-      let price = snap.price * 0.85;
-      const h = hashTicker(ticker);
-      
-      const data = { x: [], open: [], high: [], low: [], close: [] };
-      const now = new Date();
-      
-      for (let i = points; i >= 0; i--) {
-        const d = new Date(now.getTime() - i * 24 * 60 * 60 * 1000);
-        data.x.push(d.toISOString().split('T')[0]);
-        
-        // Seeded random walk
-        const seed = Math.abs((h * (i + 1) * 7919 + i * 31) % 10000) / 10000;
-        const change = (seed - 0.48) * (price * 0.03);
-        const o = price;
-        const c = price + change;
-        
-        const hSeed = Math.abs((h * (i + 1) * 104729) % 10000) / 10000;
-        const lSeed = Math.abs((h * (i + 1) * 224737) % 10000) / 10000;
-        
-        const high = Math.max(o, c) + (hSeed * price * 0.015);
-        const low = Math.min(o, c) - (lSeed * price * 0.015);
-        
-        data.open.push(+o.toFixed(2));
-        data.high.push(+high.toFixed(2));
-        data.low.push(+low.toFixed(2));
-        data.close.push(+c.toFixed(2));
-        
-        price = c;
-      }
-      
-      // Force the last point to match the snapshot price
-      data.close[data.close.length - 1] = snap.price;
-      
-      return data;
+      return null;
     }
 
     async function fetchHistoricalData(ticker, timeframe) {
+      // Always use static JSON data first — this ensures consistent prices
+      // across all machines and refreshes
+      const staticData = getStaticCandles(ticker);
+      if (staticData) return staticData;
+
+      // Only try the live API as a last resort (works on dev machine only)
       try {
         const response = await fetch(`http://127.0.0.1:5000/api/history?ticker=${ticker}&timeframe=${timeframe}`);
         return await response.json();
       } catch (e) {
-        console.warn("Backend API unavailable, falling back to mock data.");
-        return generateMockCandles(ticker);
+        console.warn("No data available for", ticker);
+        return null;
       }
     }
 
@@ -1309,30 +1288,20 @@
     }
 
     function getStockSnapshot(ticker) {
+      // Priority 1: Live API prices (from refreshPrices polling)
       if (window.LIVE_PRICES && window.LIVE_PRICES[ticker]) {
         return window.LIVE_PRICES[ticker];
       }
+      // Priority 2: Pre-fetched static JSON data (deterministic, same on every machine)
       if (window.STATIC_STOCK_DATA && window.STATIC_STOCK_DATA[ticker]) {
         return window.STATIC_STOCK_DATA[ticker].live;
       }
-
-      const h = hashTicker(ticker);
-      // Use realistic known prices
-      const basePrice = KNOWN_PRICES[ticker] || (100 + (ticker.charCodeAt(0) * 1.5));
-      // Daily seed
-      const today = new Date().toDateString();
-      let dayHash = 0;
-      for (let i = 0; i < today.length; i++) {
-        dayHash = ((dayHash << 5) - dayHash) + today.charCodeAt(i);
-      }
-      const combined = Math.abs(h ^ dayHash);
-      const dailyChange = ((combined % 600) - 280) / 100;
-      const change = basePrice * dailyChange / 100;
-      const price = basePrice + change;
+      // Priority 3: Hardcoded fallback prices (no randomness — always consistent)
+      const basePrice = KNOWN_PRICES[ticker] || 100;
       return {
-        price: +price.toFixed(2),
-        change: +change.toFixed(2),
-        changePercent: +dailyChange.toFixed(2)
+        price: basePrice,
+        change: 0,
+        changePercent: 0
       };
     }
 
