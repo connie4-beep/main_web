@@ -997,19 +997,17 @@
     };
 
     // Fallback prices (used only if stock_data.json fails to load)
-    // These should match the latest stock_data.json live prices
+    // These match the latest stock_data.json live prices
     const KNOWN_PRICES = {
-      'AAPL': 298.01, 'MSFT': 379.40, 'NVDA': 210.69, 'GOOGL': 368.03, 'META': 577.22, 'AMD': 537.37,
-      'JPM': 325.22, 'V': 327.24, 'MA': 489.79, 'BAC': 56.20, 'WFC': 82.20, 'GS': 1096.56,
-      'JNJ': 228.39, 'UNH': 400.96, 'LLY': 1098.57, 'ABBV': 216.49, 'MRK': 113.87, 'PFE': 25.21,
-      'AMZN': 244.39, 'TSLA': 400.49, 'WMT': 117.18, 'HD': 334.28, 'COST': 951.45, 'MCD': 278.61,
-      'XOM': 137.81, 'CVX': 173.63, 'COP': 107.74, 'SLB': 48.09, 'EOG': 129.98, 'OXY': 51.82,
-      'BA': 222.72, 'CAT': 985.82, 'HON': 229.01, 'UNP': 256.88, 'GE': 357.64, 'MMM': 160.60
+      'AAPL': 297.01, 'MSFT': 367.34, 'NVDA': 208.65, 'GOOGL': 349.68, 'META': 563.85, 'AMD': 551.63,
+      'JPM': 331.48, 'V': 326.60, 'MA': 484.09, 'BAC': 57.37, 'WFC': 83.84, 'GS': 1106.37,
+      'JNJ': 231.29, 'UNH': 406.68, 'LLY': 1102.08, 'ABBV': 230.01, 'MRK': 115.48, 'PFE': 25.08,
+      'AMZN': 232.79, 'TSLA': 405.05, 'WMT': 117.18, 'HD': 326.62, 'COST': 951.35, 'MCD': 270.10
     };
 
     // State
     let currentAsset = 'AAPL';
-    let currentTimeframe = '3M';
+    let currentTimeframe = '1d';
     window.LIVE_PRICES = {};
     window.STATIC_STOCK_DATA = null;
     
@@ -1069,57 +1067,26 @@
       renderChart();
     }
 
-    // --- Charting Logic (Static JSON Data with API Fallback) ---
-    function getStaticCandles(ticker) {
-      if (window.STATIC_STOCK_DATA && window.STATIC_STOCK_DATA[ticker]) {
-        const hist = window.STATIC_STOCK_DATA[ticker].history;
-        const tf = currentTimeframe.toUpperCase();
-        let days;
-        if (tf === '1D') days = 1;
-        else if (tf === '1W') days = 5;
-        else if (tf === '1M') days = 21;
-        else if (tf === '3M') days = 63;
-        else if (tf === '1Y') days = 252;
-        else if (tf === '5Y') days = hist.x.length; // use all available data
-        else days = hist.x.length;
-        
-        // Clamp to available data
-        days = Math.min(days, hist.x.length);
-        
-        return {
-          x: hist.x.slice(-days),
-          open: hist.open.slice(-days),
-          high: hist.high.slice(-days),
-          low: hist.low.slice(-days),
-          close: hist.close.slice(-days)
-        };
+    // --- Charting Logic (Yahoo Finance data from stock_data.json) ---
+    function getTimeframeData(ticker, timeframe) {
+      const tf = timeframe.toLowerCase();
+      if (window.STATIC_STOCK_DATA
+          && window.STATIC_STOCK_DATA[ticker]
+          && window.STATIC_STOCK_DATA[ticker].timeframes
+          && window.STATIC_STOCK_DATA[ticker].timeframes[tf]) {
+        return window.STATIC_STOCK_DATA[ticker].timeframes[tf];
       }
       return null;
     }
 
-    async function fetchHistoricalData(ticker, timeframe) {
-      // Always use static JSON data first — this ensures consistent prices
-      // across all machines and refreshes
-      const staticData = getStaticCandles(ticker);
-      if (staticData) return staticData;
-
-      // Only try the live API as a last resort (works on dev machine only)
-      try {
-        const response = await fetch(`http://127.0.0.1:5000/api/history?ticker=${ticker}&timeframe=${timeframe}`);
-        return await response.json();
-      } catch (e) {
-        console.warn("No data available for", ticker);
-        return null;
-      }
-    }
-
-    async function renderChart() {
+    function renderChart() {
       chartLoading.classList.add('active');
       
-      const data = await fetchHistoricalData(currentAsset, currentTimeframe);
+      const data = getTimeframeData(currentAsset, currentTimeframe);
       
-      if (!data || !data.x) {
+      if (!data || !data.x || data.x.length === 0) {
         chartLoading.classList.remove('active');
+        console.warn(`No data for ${currentAsset} @ ${currentTimeframe}`);
         return;
       }
         
@@ -1278,25 +1245,17 @@
       } catch (e) { portfolio = []; }
     }
 
-    // --- Mock Data Helpers ---
-    function hashTicker(ticker) {
-      let hash = 5381;
-      for (let i = 0; i < ticker.length; i++) {
-        hash = ((hash << 5) + hash) + ticker.charCodeAt(i);
-      }
-      return Math.abs(hash);
-    }
-
+    // --- Data Helpers (Yahoo Finance powered) ---
     function getStockSnapshot(ticker) {
       // Priority 1: Live API prices (from refreshPrices polling)
       if (window.LIVE_PRICES && window.LIVE_PRICES[ticker]) {
         return window.LIVE_PRICES[ticker];
       }
-      // Priority 2: Pre-fetched static JSON data (deterministic, same on every machine)
+      // Priority 2: Pre-fetched Yahoo Finance data from stock_data.json
       if (window.STATIC_STOCK_DATA && window.STATIC_STOCK_DATA[ticker]) {
         return window.STATIC_STOCK_DATA[ticker].live;
       }
-      // Priority 3: Hardcoded fallback prices (no randomness — always consistent)
+      // Priority 3: Hardcoded fallback prices (no randomness)
       const basePrice = KNOWN_PRICES[ticker] || 100;
       return {
         price: basePrice,
@@ -1306,18 +1265,18 @@
     }
 
     function generateSparklineData(ticker) {
-      const h = hashTicker(ticker);
-      const snap = getStockSnapshot(ticker);
-      const points = [];
-      let price = snap.price * 0.97;
-      for (let i = 0; i < 20; i++) {
-        const seed = Math.abs((h * (i + 1) * 7919 + i * 31) % 10000);
-        const delta = ((seed % 100) - 47) / 100 * (snap.price * 0.015);
-        price = Math.max(price + delta, snap.price * 0.9);
-        points.push(+price.toFixed(2));
+      // Use real 1-week close prices from Yahoo Finance data
+      if (window.STATIC_STOCK_DATA
+          && window.STATIC_STOCK_DATA[ticker]
+          && window.STATIC_STOCK_DATA[ticker].timeframes
+          && window.STATIC_STOCK_DATA[ticker].timeframes['1w']) {
+        const weekData = window.STATIC_STOCK_DATA[ticker].timeframes['1w'];
+        // Take the last 20 close prices (or all if fewer)
+        return weekData.close.slice(-20);
       }
-      points[points.length - 1] = snap.price;
-      return points;
+      // Fallback: just return the current price as a flat line
+      const snap = getStockSnapshot(ticker);
+      return Array(20).fill(snap.price);
     }
 
     // --- Toast Notifications ---
