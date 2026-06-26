@@ -1078,7 +1078,7 @@
       
       let data = null;
       try {
-        const res = await fetch(`http://127.0.0.1:5000/api/history?ticker=${currentAsset}&timeframe=${currentTimeframe}`);
+        const res = await fetch(`http://127.0.0.1:5000/api/history?ticker=${currentAsset}&timeframe=${currentTimeframe}&t=${Date.now()}`);
         if (!res.ok) throw new Error('API fetch failed');
         data = await res.json();
       } catch(e) {
@@ -1118,29 +1118,6 @@
           hoverinfo: 'text+name+y'
         };
 
-        const tickvals = [];
-        const ticktext = [];
-        // Show roughly 6 ticks on the x-axis to prevent clutter
-        const step = Math.max(1, Math.floor(data.x.length / 6));
-        for (let i = 0; i < data.x.length; i += step) {
-          tickvals.push(i); // Map tick to index
-          const dStr = data.x[i];
-          const d = new Date(dStr);
-          
-          if (currentTimeframe === '1d') {
-            ticktext.push(d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
-          } else if (currentTimeframe === '1w') {
-            // Very short for 1w: "Jun 15, 09:30"
-            const monthDay = d.toLocaleDateString([], { month: 'short', day: 'numeric' });
-            const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            ticktext.push(`${monthDay} ${timeStr}`);
-          } else if (currentTimeframe === '1m' || currentTimeframe === '3m') {
-            ticktext.push(d.toLocaleDateString([], { month: 'short', day: 'numeric' }));
-          } else {
-            ticktext.push(d.toLocaleDateString([], { year: 'numeric', month: 'short' }));
-          }
-        }
-
         const layout = {
           title: {
             text: `${currentAsset} Market Performance`,
@@ -1153,10 +1130,16 @@
             rangeslider: { visible: false },
             gridcolor: 'rgba(44,42,41,0.05)',
             zerolinecolor: 'rgba(44,42,41,0.05)',
-            type: 'linear', // Use linear axis for indices
-            tickmode: 'array',
-            tickvals: tickvals,
-            ticktext: ticktext
+            type: 'date',
+            rangebreaks: (function() {
+              const breaks = [];
+              if (currentTimeframe === '1d' || currentTimeframe === '1w') {
+                breaks.push({ pattern: 'day of week', bounds: ['sat', 'mon'] });
+                // With prepost=True, trading ends at 20:00 and begins at 04:00
+                breaks.push({ pattern: 'hour', bounds: [20, 4] });
+              }
+              return breaks;
+            })()
           },
           yaxis: {
             title: 'Price (USD)',
@@ -1309,7 +1292,7 @@
         return window.SPARKLINE_CACHE[ticker];
       }
       try {
-        const res = await fetch(`http://127.0.0.1:5000/api/history?ticker=${ticker}&timeframe=1w`);
+        const res = await fetch(`http://127.0.0.1:5000/api/history?ticker=${ticker}&timeframe=1w&t=${Date.now()}`);
         const data = await res.json();
         if (data.close && data.close.length > 0) {
           const sparkData = data.close.slice(-20);
@@ -1693,7 +1676,7 @@
 
         for (const ticker of tickers) {
           try {
-            const res = await fetch(`http://127.0.0.1:5000/api/quote?ticker=${ticker}`);
+            const res = await fetch(`http://127.0.0.1:5000/api/quote?ticker=${ticker}&t=${Date.now()}`);
             const data = await res.json();
             if (!data.error) {
               window.LIVE_PRICES[ticker] = {

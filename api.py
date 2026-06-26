@@ -43,9 +43,9 @@ def history():
         
         # Map timeframe to yfinance period/interval
         if timeframe == '1d':
-            df = stock.history(period='1d', interval='5m')
+            df = stock.history(period='1d', interval='5m', prepost=True)
         elif timeframe == '1w':
-            df = stock.history(period='5d', interval='15m')
+            df = stock.history(period='5d', interval='15m', prepost=True)
         elif timeframe == '1m':
             df = stock.history(period='1mo', interval='1d')
         elif timeframe == '3m':
