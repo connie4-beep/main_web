@@ -99,32 +99,3 @@ function toggleDetails(id) {
     if (btn) btn.textContent = 'Hide Details ▴';
   }
 }
-
-// --- Custom Greninja Cursor ---
-const greninjaCursor = document.getElementById('greninja-cursor');
-if (greninjaCursor) {
-  let mouseX = 0;
-  let mouseY = 0;
-  let isMoving = false;
-
-  window.addEventListener('mousemove', (e) => {
-    // Hide cursor if hovering over a Plotly chart to avoid blocking data
-    if (e.target.closest('.js-plotly-plot') || e.target.closest('.plotly')) {
-      greninjaCursor.style.display = 'none';
-      return;
-    } else {
-      greninjaCursor.style.display = 'block';
-    }
-
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    
-    if (!isMoving) {
-      isMoving = true;
-      window.requestAnimationFrame(() => {
-        greninjaCursor.style.transform = `translate3d(${mouseX + 15}px, ${mouseY + 15}px, 0)`;
-        isMoving = false;
-      });
-    }
-  });
-}
