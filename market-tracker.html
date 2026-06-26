@@ -1131,10 +1131,29 @@
             type: 'date',
             rangebreaks: (function() {
               const breaks = [];
+              // Always hide weekends on all timeframes
+              breaks.push({ pattern: 'day of week', bounds: ['sat', 'mon'] });
+              
               if (currentTimeframe === '1d' || currentTimeframe === '1w') {
-                breaks.push({ pattern: 'day of week', bounds: ['sat', 'mon'] });
                 // With prepost=True, trading ends at 20:00 and begins at 04:00
                 breaks.push({ pattern: 'hour', bounds: [20, 4] });
+              } else if (data.x && data.x.length > 0) {
+                // For daily timeframes, dynamically detect and hide holidays (missing weekdays)
+                const missingDates = [];
+                let dte = new Date(data.x[0].split('T')[0]);
+                const end = new Date(data.x[data.x.length - 1].split('T')[0]);
+                const existing = new Set(data.x.map(d => d.split('T')[0]));
+                
+                while (dte <= end) {
+                  const dStr = dte.toISOString().split('T')[0];
+                  if (dte.getUTCDay() !== 0 && dte.getUTCDay() !== 6 && !existing.has(dStr)) {
+                    missingDates.push(dStr);
+                  }
+                  dte.setUTCDate(dte.getUTCDate() + 1);
+                }
+                if (missingDates.length > 0) {
+                  breaks.push({ values: missingDates });
+                }
               }
               return breaks;
             })()
