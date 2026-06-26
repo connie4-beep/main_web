@@ -1092,11 +1092,9 @@
         return;
       }
         
-        // 1. Create a continuous array of indices [0, 1, 2, ... N-1]
-        const indices = Array.from({ length: data.x.length }, (_, i) => i);
-        
+        // Pass the actual date strings directly to Plotly
         const trace = {
-          x: indices,
+          x: data.x,
           close: data.close,
           high: data.high,
           low: data.low,
