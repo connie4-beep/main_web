@@ -1137,15 +1137,17 @@
               if (currentTimeframe === '1d' || currentTimeframe === '1w') {
                 // With prepost=True, trading ends at 20:00 and begins at 04:00
                 breaks.push({ pattern: 'hour', bounds: [20, 4] });
-              } else if (data.x && data.x.length > 0) {
-                // For daily timeframes, dynamically detect and hide holidays (missing weekdays)
+              }
+              
+              if (data.x && data.x.length > 0) {
+                // Dynamically detect and hide holidays (missing weekdays) on all timeframes
                 const missingDates = [];
-                let dte = new Date(data.x[0].split('T')[0]);
-                const end = new Date(data.x[data.x.length - 1].split('T')[0]);
-                const existing = new Set(data.x.map(d => d.split('T')[0]));
+                let dte = new Date(data.x[0].substring(0, 10));
+                const end = new Date(data.x[data.x.length - 1].substring(0, 10));
+                const existing = new Set(data.x.map(d => d.substring(0, 10)));
                 
                 while (dte <= end) {
-                  const dStr = dte.toISOString().split('T')[0];
+                  const dStr = dte.toISOString().substring(0, 10);
                   if (dte.getUTCDay() !== 0 && dte.getUTCDay() !== 6 && !existing.has(dStr)) {
                     missingDates.push(dStr);
                   }
