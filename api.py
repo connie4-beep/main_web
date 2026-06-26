@@ -57,6 +57,14 @@ def history():
         else:
             df = stock.history(period='1d', interval='5m')
             
+        # Clean bad ticks (massive anomalous spikes in Yahoo Finance after-hours data)
+        max_body = df[['Open', 'Close']].max(axis=1)
+        min_body = df[['Open', 'Close']].min(axis=1)
+        bad_high = df['High'] > max_body * 1.02  # Cap wicks > 2% of body
+        bad_low = df['Low'] < min_body * 0.98
+        df.loc[bad_high, 'High'] = max_body[bad_high]
+        df.loc[bad_low, 'Low'] = min_body[bad_low]
+            
         df.reset_index(inplace=True)
         date_col = 'Datetime' if 'Datetime' in df.columns else 'Date'
         
