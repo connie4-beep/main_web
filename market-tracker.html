@@ -1096,8 +1096,26 @@
         const lineColor = isPositive ? '#22c55e' : '#ef4444';
         const fillColor = isPositive ? 'rgba(34,197,94,0.1)' : 'rgba(239,68,68,0.1)';
 
+        // 1. Create a continuous array of indices [0, 1, 2, ... N-1] to natively skip ALL gaps
+        const indices = Array.from({ length: data.x.length }, (_, i) => i);
+        
+        // 2. Generate clean, evenly spaced labels for the X-axis
+        const tickvals = [];
+        const ticktext = [];
+        const numTicks = 6;
+        const step = Math.max(1, Math.floor(data.x.length / numTicks));
+        for (let i = 0; i < data.x.length; i += step) {
+           tickvals.push(i);
+           const dStr = data.x[i];
+           const d = new Date(dStr);
+           const label = (dStr.includes('T') || dStr.includes(' ')) ? 
+              d.toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) :
+              d.toLocaleDateString([], {month:'short', day:'numeric'});
+           ticktext.push(label);
+        }
+
         const trace = {
-          x: data.x,
+          x: indices,
           y: data.close,
           type: 'scatter',
           mode: 'lines',
@@ -1105,10 +1123,10 @@
           fill: 'tozeroy',
           fillcolor: fillColor,
           name: currentAsset,
-          // Custom hovertext so the tooltip shows the correct date!
+          // Custom hovertext so the tooltip shows the exact date!
           text: data.x.map(dStr => {
              const d = new Date(dStr);
-             return dStr.includes('T') ? 
+             return (dStr.includes('T') || dStr.includes(' ')) ? 
                 d.toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) :
                 d.toLocaleDateString([], {year:'numeric', month:'short', day:'numeric'});
           }),
@@ -1132,37 +1150,8 @@
             rangeslider: { visible: false },
             gridcolor: 'rgba(44,42,41,0.05)',
             zerolinecolor: 'rgba(44,42,41,0.05)',
-            type: 'date',
-            rangebreaks: (function() {
-              const breaks = [];
-              // Always hide weekends on all timeframes
-              breaks.push({ pattern: 'day of week', bounds: ['sat', 'mon'] });
-              
-              if (currentTimeframe === '1d' || currentTimeframe === '1w') {
-                // With prepost=True, trading ends at 20:00 and begins at 04:00
-                breaks.push({ pattern: 'hour', bounds: [20, 4] });
-              }
-              
-              if (data.x && data.x.length > 0) {
-                // Dynamically detect and hide holidays (missing weekdays) on all timeframes
-                const missingDates = [];
-                let dte = new Date(data.x[0].substring(0, 10));
-                const end = new Date(data.x[data.x.length - 1].substring(0, 10));
-                const existing = new Set(data.x.map(d => d.substring(0, 10)));
-                
-                while (dte <= end) {
-                  const dStr = dte.toISOString().substring(0, 10);
-                  if (dte.getUTCDay() !== 0 && dte.getUTCDay() !== 6 && !existing.has(dStr)) {
-                    missingDates.push(dStr);
-                  }
-                  dte.setUTCDate(dte.getUTCDate() + 1);
-                }
-                if (missingDates.length > 0) {
-                  breaks.push({ values: missingDates });
-                }
-              }
-              return breaks;
-            })()
+            tickvals: tickvals,
+            ticktext: ticktext
           },
           yaxis: {
             title: 'Price (USD)',
