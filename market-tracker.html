@@ -1115,6 +1115,11 @@
           hoverinfo: 'text+name+y'
         };
 
+        const minPrice = Math.min(...data.close);
+        const maxPrice = Math.max(...data.close);
+        const padding = (maxPrice - minPrice) * 0.1;
+        const finalPadding = padding === 0 ? minPrice * 0.001 : padding;
+
         const layout = {
           title: {
             text: `${currentAsset} Market Performance`,
@@ -1163,7 +1168,8 @@
             title: 'Price (USD)',
             gridcolor: 'rgba(44,42,41,0.05)',
             zerolinecolor: 'rgba(44,42,41,0.05)',
-            tickprefix: '$'
+            tickprefix: '$',
+            range: [minPrice - finalPadding, maxPrice + finalPadding]
           },
           margin: { l: 60, r: 20, t: 60, b: 80 }
         };
