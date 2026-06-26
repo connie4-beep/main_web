@@ -820,7 +820,13 @@
     <div class="split-view">
       
       <!-- Chart Area -->
-      <div class="chart-container">
+      <div class="chart-container" style="position: relative;">
+        <!-- Live Price Header -->
+        <div style="position: absolute; top: 20px; left: 30px; z-index: 10;">
+          <div id="main-chart-price" style="font-size: 2rem; font-weight: 700; font-family: var(--font-heading); color: var(--text-primary); line-height: 1.1;">$0.00</div>
+          <div id="main-chart-change" style="font-size: 1rem; font-weight: 600; margin-top: 4px;">--</div>
+        </div>
+        
         <div class="loading-overlay" id="chart-loading">
           <div class="spinner"></div>
         </div>
@@ -1026,13 +1032,6 @@
 
     // --- Initialization ---
     async function init() {
-      try {
-        const res = await fetch('stock_data.json');
-        window.STATIC_STOCK_DATA = await res.json();
-      } catch(e) {
-        console.warn("Could not load static stock data", e);
-      }
-
       updateAssetDropdown('Technology');
       // Event Listeners
       sectorSelect.addEventListener('change', (e) => updateAssetDropdown(e.target.value));
@@ -1067,31 +1066,37 @@
       renderChart();
     }
 
-    // --- Charting Logic (Yahoo Finance data from stock_data.json) ---
+    // --- Charting Logic (Live API) ---
     function getTimeframeData(ticker, timeframe) {
-      const tf = timeframe.toLowerCase();
-      if (window.STATIC_STOCK_DATA
-          && window.STATIC_STOCK_DATA[ticker]
-          && window.STATIC_STOCK_DATA[ticker].timeframes
-          && window.STATIC_STOCK_DATA[ticker].timeframes[tf]) {
-        return window.STATIC_STOCK_DATA[ticker].timeframes[tf];
-      }
-      return null;
+      return null; // Deprecated, all charting now fetches live API data
     }
 
-    function renderChart() {
-      chartLoading.classList.add('active');
+    async function renderChart(isBackgroundRefresh = false) {
+      if (!isBackgroundRefresh) {
+        chartLoading.classList.add('active');
+      }
       
-      const data = getTimeframeData(currentAsset, currentTimeframe);
+      let data = null;
+      try {
+        const res = await fetch(`http://127.0.0.1:5000/api/history?ticker=${currentAsset}&timeframe=${currentTimeframe}`);
+        if (!res.ok) throw new Error('API fetch failed');
+        data = await res.json();
+      } catch(e) {
+        if (!isBackgroundRefresh) console.warn(`Failed to fetch real-time chart data from API for ${currentAsset}, falling back to static data.`, e);
+        data = getTimeframeData(currentAsset, currentTimeframe);
+      }
       
       if (!data || !data.x || data.x.length === 0) {
-        chartLoading.classList.remove('active');
+        if (!isBackgroundRefresh) chartLoading.classList.remove('active');
         console.warn(`No data for ${currentAsset} @ ${currentTimeframe}`);
         return;
       }
         
+        // 1. Create a continuous array of indices [0, 1, 2, ... N-1]
+        const indices = Array.from({ length: data.x.length }, (_, i) => i);
+        
         const trace = {
-          x: data.x,
+          x: indices,
           close: data.close,
           high: data.high,
           low: data.low,
@@ -1102,8 +1107,39 @@
           type: 'candlestick',
           xaxis: 'x',
           yaxis: 'y',
-          name: currentAsset
+          name: currentAsset,
+          // Custom hovertext so the tooltip shows the correct date instead of an index!
+          text: data.x.map(dStr => {
+             const d = new Date(dStr);
+             return dStr.includes('T') ? 
+                d.toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) :
+                d.toLocaleDateString([], {year:'numeric', month:'short', day:'numeric'});
+          }),
+          hoverinfo: 'text+name+y'
         };
+
+        const tickvals = [];
+        const ticktext = [];
+        // Show roughly 6 ticks on the x-axis to prevent clutter
+        const step = Math.max(1, Math.floor(data.x.length / 6));
+        for (let i = 0; i < data.x.length; i += step) {
+          tickvals.push(i); // Map tick to index
+          const dStr = data.x[i];
+          const d = new Date(dStr);
+          
+          if (currentTimeframe === '1d') {
+            ticktext.push(d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+          } else if (currentTimeframe === '1w') {
+            // Very short for 1w: "Jun 15, 09:30"
+            const monthDay = d.toLocaleDateString([], { month: 'short', day: 'numeric' });
+            const timeStr = d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            ticktext.push(`${monthDay} ${timeStr}`);
+          } else if (currentTimeframe === '1m' || currentTimeframe === '3m') {
+            ticktext.push(d.toLocaleDateString([], { month: 'short', day: 'numeric' }));
+          } else {
+            ticktext.push(d.toLocaleDateString([], { year: 'numeric', month: 'short' }));
+          }
+        }
 
         const layout = {
           title: {
@@ -1116,7 +1152,11 @@
           xaxis: {
             rangeslider: { visible: false },
             gridcolor: 'rgba(44,42,41,0.05)',
-            zerolinecolor: 'rgba(44,42,41,0.05)'
+            zerolinecolor: 'rgba(44,42,41,0.05)',
+            type: 'linear', // Use linear axis for indices
+            tickmode: 'array',
+            tickvals: tickvals,
+            ticktext: ticktext
           },
           yaxis: {
             title: 'Price (USD)',
@@ -1124,13 +1164,16 @@
             zerolinecolor: 'rgba(44,42,41,0.05)',
             tickprefix: '$'
           },
-          margin: { l: 60, r: 20, t: 60, b: 40 }
+          margin: { l: 60, r: 20, t: 60, b: 80 }
         };
 
         const config = { responsive: true, displayModeBar: false };
 
-        Plotly.newPlot('plotly-chart', [trace], layout, config);
-        chartLoading.classList.remove('active');
+        // Instead of redrawing everything which flashes the screen, use Plotly.react
+        Plotly.react('plotly-chart', [trace], layout, config);
+        if (!isBackgroundRefresh) {
+           chartLoading.classList.remove('active');
+        }
     }
 
     // --- Chatbot Logic (Smart Client-Side Mock) ---
@@ -1251,11 +1294,7 @@
       if (window.LIVE_PRICES && window.LIVE_PRICES[ticker]) {
         return window.LIVE_PRICES[ticker];
       }
-      // Priority 2: Pre-fetched Yahoo Finance data from stock_data.json
-      if (window.STATIC_STOCK_DATA && window.STATIC_STOCK_DATA[ticker]) {
-        return window.STATIC_STOCK_DATA[ticker].live;
-      }
-      // Priority 3: Hardcoded fallback prices (no randomness)
+      // Priority 2: Hardcoded fallback prices (no randomness)
       const basePrice = KNOWN_PRICES[ticker] || 100;
       return {
         price: basePrice,
@@ -1264,15 +1303,21 @@
       };
     }
 
-    function generateSparklineData(ticker) {
-      // Use real 1-week close prices from Yahoo Finance data
-      if (window.STATIC_STOCK_DATA
-          && window.STATIC_STOCK_DATA[ticker]
-          && window.STATIC_STOCK_DATA[ticker].timeframes
-          && window.STATIC_STOCK_DATA[ticker].timeframes['1w']) {
-        const weekData = window.STATIC_STOCK_DATA[ticker].timeframes['1w'];
-        // Take the last 20 close prices (or all if fewer)
-        return weekData.close.slice(-20);
+    window.SPARKLINE_CACHE = {};
+    async function generateSparklineData(ticker) {
+      if (window.SPARKLINE_CACHE[ticker]) {
+        return window.SPARKLINE_CACHE[ticker];
+      }
+      try {
+        const res = await fetch(`http://127.0.0.1:5000/api/history?ticker=${ticker}&timeframe=1w`);
+        const data = await res.json();
+        if (data.close && data.close.length > 0) {
+          const sparkData = data.close.slice(-20);
+          window.SPARKLINE_CACHE[ticker] = sparkData;
+          return sparkData;
+        }
+      } catch (e) {
+        console.warn('Failed to fetch sparkline for ' + ticker);
       }
       // Fallback: just return the current price as a flat line
       const snap = getStockSnapshot(ticker);
@@ -1356,8 +1401,9 @@
 
       // Render sparklines after DOM update
       requestAnimationFrame(function() {
-        watchlist.forEach(function(ticker) {
-          renderSparkline('spark-' + ticker, generateSparklineData(ticker), getStockSnapshot(ticker).change >= 0);
+        watchlist.forEach(async function(ticker) {
+          const data = await generateSparklineData(ticker);
+          renderSparkline('spark-' + ticker, data, getStockSnapshot(ticker).change >= 0);
         });
         setupDragAndDrop();
       });
@@ -1635,6 +1681,7 @@
       assetSelect.addEventListener('change', function() {
         setTimeout(function() {
           document.getElementById('pos-ticker').value = currentAsset;
+          refreshPrices(); // Instantly update the live price header for the newly selected asset
         }, 0);
       });
 
@@ -1661,6 +1708,21 @@
         priceTick++;
         if (watchlist.length > 0) renderWatchlist();
         if (portfolio.length > 0) renderPortfolio();
+        
+        // Update main chart header price
+        const snap = getStockSnapshot(currentAsset);
+        const priceEl = document.getElementById('main-chart-price');
+        const changeEl = document.getElementById('main-chart-change');
+        if (priceEl && changeEl) {
+          priceEl.textContent = '$' + snap.price.toFixed(2);
+          const sign = snap.change >= 0 ? '+' : '';
+          const color = snap.change >= 0 ? 'var(--color-success)' : 'var(--color-danger)';
+          changeEl.textContent = sign + snap.change.toFixed(2) + ' (' + sign + snap.changePercent.toFixed(2) + '%)';
+          changeEl.style.color = color;
+        }
+
+        // Silently update the main chart with the absolute newest live candlestick data
+        renderChart(true);
         
         var now = new Date();
         var timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
