@@ -81,6 +81,39 @@ def history():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/news')
+def news():
+    ticker = request.args.get('ticker')
+    if not ticker:
+        return jsonify({'error': 'Missing ticker'}), 400
+    
+    try:
+        stock = yf.Ticker(ticker)
+        raw_news = stock.news or []
+        
+        articles = []
+        for item in raw_news[:8]:
+            content = item.get('content', {})
+            title = content.get('title', '')
+            summary = content.get('summary', '')
+            pub_date = content.get('pubDate', '')
+            provider = content.get('provider', {}).get('displayName', 'Unknown')
+            url_info = content.get('canonicalUrl', {})
+            url = url_info.get('url', '') if isinstance(url_info, dict) else ''
+            
+            if title:
+                articles.append({
+                    'title': title,
+                    'summary': summary,
+                    'pubDate': pub_date,
+                    'source': provider,
+                    'url': url
+                })
+        
+        return jsonify({'articles': articles})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     # Run on port 5000
     app.run(port=5000, debug=True)

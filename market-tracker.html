@@ -1172,8 +1172,40 @@
         }
     }
 
-    // --- Chatbot Logic (Smart Client-Side Mock) ---
-    function handleChatSubmit(e) {
+    // --- Chatbot Logic (Real Yahoo Finance News Powered) ---
+    
+    // News cache: { ticker: { articles: [...], fetchedAt: timestamp } }
+    window.NEWS_CACHE = {};
+    
+    async function fetchNewsForTicker(ticker) {
+      const cached = window.NEWS_CACHE[ticker];
+      // Cache news for 5 minutes
+      if (cached && (Date.now() - cached.fetchedAt < 300000)) {
+        return cached.articles;
+      }
+      try {
+        const res = await fetch(`http://127.0.0.1:5000/api/news?ticker=${ticker}&t=${Date.now()}`);
+        const data = await res.json();
+        if (data.articles) {
+          window.NEWS_CACHE[ticker] = { articles: data.articles, fetchedAt: Date.now() };
+          return data.articles;
+        }
+      } catch (e) {
+        console.warn('Failed to fetch news for', ticker);
+      }
+      return [];
+    }
+    
+    function formatTimeAgo(dateStr) {
+      if (!dateStr) return '';
+      const diff = Date.now() - new Date(dateStr).getTime();
+      const hrs = Math.floor(diff / 3600000);
+      if (hrs < 1) return `${Math.floor(diff / 60000)} min ago`;
+      if (hrs < 24) return `${hrs}h ago`;
+      return `${Math.floor(hrs / 24)}d ago`;
+    }
+
+    async function handleChatSubmit(e) {
       e.preventDefault();
       const text = chatInput.value.trim();
       if (!text) return;
@@ -1186,52 +1218,90 @@
       typingIndicator.classList.add('active');
       chatMessages.scrollTop = chatMessages.scrollHeight;
       
-      setTimeout(() => {
-        typingIndicator.classList.remove('active');
-        
-        let response = "";
-        const lowerText = text.toLowerCase();
-        
-        // Context
-        const snap = getStockSnapshot(currentAsset);
-        const holdPos = portfolio.find(p => p.ticker === currentAsset);
-        const sharesHeld = holdPos ? holdPos.shares : 0;
-        const costBasis = holdPos ? holdPos.avgCost : 0;
-        const mktVal = holdPos ? (snap.price * sharesHeld) : 0;
-        const pnl = holdPos ? (mktVal - (costBasis * sharesHeld)) : 0;
-        const pnlPct = costBasis > 0 ? (pnl / (costBasis * sharesHeld) * 100).toFixed(1) : 0;
+      // Fetch real news + price data in parallel
+      const [articles, snap] = await Promise.all([
+        fetchNewsForTicker(currentAsset),
+        Promise.resolve(getStockSnapshot(currentAsset))
+      ]);
+      
+      typingIndicator.classList.remove('active');
+      
+      let response = "";
+      const lowerText = text.toLowerCase();
+      
+      // Context
+      const holdPos = portfolio.find(p => p.ticker === currentAsset);
+      const sharesHeld = holdPos ? holdPos.shares : 0;
+      const costBasis = holdPos ? holdPos.avgCost : 0;
+      const mktVal = holdPos ? (snap.price * sharesHeld) : 0;
+      const pnl = holdPos ? (mktVal - (costBasis * sharesHeld)) : 0;
+      const pnlPct = costBasis > 0 ? (pnl / (costBasis * sharesHeld) * 100).toFixed(1) : 0;
 
-        // Intent Parser
-        if (lowerText.includes('portfolio') || lowerText.includes('hold') || lowerText.includes('own') || lowerText.includes('how much') || lowerText.includes('my position')) {
-           if (sharesHeld > 0) {
-              response = `You currently hold **${sharesHeld} shares** of ${currentAsset} at an average cost of $${costBasis.toFixed(2)}. Your position is worth **$${mktVal.toFixed(2)}**, which is a P&L of **$${pnl.toFixed(2)} (${pnl >= 0 ? '+' : ''}${pnlPct}%)**.`;
-           } else {
-              response = `You don't currently hold any shares of ${currentAsset} in your portfolio. You can add a position using the Portfolio tab below!`;
-           }
-        } else if (lowerText.includes('price') || lowerText.includes('quote') || lowerText.includes('current')) {
-           response = `The current market price for ${currentAsset} is **$${snap.price.toFixed(2)}**, which is ${snap.change >= 0 ? 'up' : 'down'} ${snap.changePercent}% today.`;
-        } else if (lowerText.includes('buy') || lowerText.includes('sell') || lowerText.includes('advice')) {
-           response = `As an AI, I don't provide financial advice. However, based on your portfolio${sharesHeld > 0 ? ` (where you are ${pnl >= 0 ? 'up' : 'down'} on ${currentAsset})` : ''}, I recommend checking the ${currentTimeframe.toUpperCase()} chart for recent volatility trends before making a decision.`;
-        } else if (lowerText.includes('summary') || lowerText.includes('what is')) {
-           const info = MOCK_COMPANY_INFO[currentAsset] || `This is a highly liquid stock in the ${sectorSelect.value} sector.`;
-           response = `**${currentAsset}**: ${info}`;
-        } else {
-           response = `I'm tracking the live data for ${currentAsset}. The current price is $${snap.price.toFixed(2)}. You can ask me things like "How much AAPL do I hold?" or "What is the price of NVDA?".`;
-        }
-        
-        appendMessage('assistant', response);
-        
-        chatInput.disabled = false;
-        chatSubmit.disabled = false;
-        chatInput.focus();
-      }, 1000);
+      // Intent Parser
+      if (lowerText.includes('buy') || lowerText.includes('sell') || lowerText.includes('should i') || lowerText.includes('advice') || lowerText.includes('recommend')) {
+         response = `⚠️ I don't provide financial advice or opinions on whether to buy or sell. I can only share factual market data and recent news. Try asking **"What's happening with ${currentAsset}?"** or **"Show me the latest news"** instead!`;
+      } else if (lowerText.includes('news') || lowerText.includes('happening') || lowerText.includes('why') || lowerText.includes('what happened') || lowerText.includes("what's going on") || lowerText.includes('update') || lowerText.includes('latest')) {
+         if (articles.length > 0) {
+            response = `📰 **Latest news for ${currentAsset}:**\n\n`;
+            articles.slice(0, 4).forEach((a, i) => {
+              const timeAgo = formatTimeAgo(a.pubDate);
+              response += `**${i + 1}. ${a.title}**\n`;
+              if (a.summary) response += `${a.summary}\n`;
+              response += `_${a.source}${timeAgo ? ' · ' + timeAgo : ''}_\n\n`;
+            });
+         } else {
+            response = `I couldn't find any recent news articles for ${currentAsset} right now. The current price is **$${snap.price.toFixed(2)}** (${snap.change >= 0 ? '+' : ''}${snap.changePercent}% today).`;
+         }
+      } else if (lowerText.includes('portfolio') || lowerText.includes('hold') || lowerText.includes('own') || lowerText.includes('how much') || lowerText.includes('my position')) {
+         if (sharesHeld > 0) {
+            response = `You currently hold **${sharesHeld} shares** of ${currentAsset} at an average cost of $${costBasis.toFixed(2)}. Your position is worth **$${mktVal.toFixed(2)}**, which is a P&L of **$${pnl.toFixed(2)} (${pnl >= 0 ? '+' : ''}${pnlPct}%)**.`;
+         } else {
+            response = `You don't currently hold any shares of ${currentAsset} in your portfolio. You can add a position using the Portfolio tab below!`;
+         }
+      } else if (lowerText.includes('price') || lowerText.includes('quote') || lowerText.includes('current') || lowerText.includes('how much is')) {
+         response = `The current market price for **${currentAsset}** is **$${snap.price.toFixed(2)}**, which is ${snap.change >= 0 ? 'up' : 'down'} **${snap.change >= 0 ? '+' : ''}${snap.changePercent}%** today.`;
+         if (articles.length > 0) {
+            response += `\n\n📰 Top headline: **${articles[0].title}**`;
+            if (articles[0].summary) response += `\n${articles[0].summary}`;
+         }
+      } else if (lowerText.includes('summary') || lowerText.includes('tell me about') || lowerText.includes('what is')) {
+         response = `**${currentAsset}** is currently trading at **$${snap.price.toFixed(2)}** (${snap.change >= 0 ? '+' : ''}${snap.changePercent}% today).\n\n`;
+         if (articles.length > 0) {
+            response += `Here's what's been in the news recently:\n\n`;
+            articles.slice(0, 3).forEach((a, i) => {
+              response += `**${i + 1}. ${a.title}**\n`;
+              if (a.summary) response += `${a.summary}\n`;
+              response += `_${a.source} · ${formatTimeAgo(a.pubDate)}_\n\n`;
+            });
+         }
+         response += `_Note: This is factual market data only, not financial advice._`;
+      } else {
+         // Default: show price + top headline
+         response = `**${currentAsset}** is at **$${snap.price.toFixed(2)}** (${snap.change >= 0 ? '+' : ''}${snap.changePercent}% today).\n\n`;
+         if (articles.length > 0) {
+            response += `📰 Latest: **${articles[0].title}**\n`;
+            if (articles[0].summary) response += `${articles[0].summary}\n\n`;
+         }
+         response += `You can ask me:\n• **"What's happening with ${currentAsset}?"** — latest news\n• **"What is the price?"** — current quote\n• **"Show my portfolio"** — your holdings`;
+      }
+      
+      appendMessage('assistant', response);
+      
+      chatInput.disabled = false;
+      chatSubmit.disabled = false;
+      chatInput.focus();
     }
 
     function appendMessage(role, text) {
       const div = document.createElement('div');
       div.className = `message ${role}`;
-      // Basic markdown parsing for bold text
-      div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+      // Markdown parsing: bold, italic, newlines, bullet points
+      let html = text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/_(.*?)_/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>')
+        .replace(/• /g, '&bull; ');
+      div.innerHTML = html;
       chatMessages.appendChild(div);
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
