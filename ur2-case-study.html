@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="UR2 TestKit product design case study by Connie Zhang: translating a physical chemical-analysis procedure into a guided mobile workflow." />
+  <title>UR2 TestKit Case Study | Connie Zhang</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar scrolled" id="navbar">
+    <div class="navbar-inner">
+      <a href="index.html#hero" class="nav-logo">CZ</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#experience">Experience</a></li>
+        <li><a href="index.html#projects">Case Studies</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+      <div class="nav-social">
+        <a href="https://github.com/connie4-beep" target="_blank" rel="noopener noreferrer" aria-label="GitHub">GH</a>
+        <a href="https://www.linkedin.com/in/connie-z-51727529a/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">LI</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="case-page">
+    <div class="container">
+      <a class="case-back" href="index.html#experience">← Back to portfolio</a>
+      <span class="case-kicker">Product Design · Frontend Engineering · Physical Workflow</span>
+      <h1 class="case-title">Guiding a complex chemical test from setup to result</h1>
+      <p class="case-lede">
+        UR2 TestKit is a mobile-first product that connects a field user, laboratory hardware, and a computer-vision analysis pipeline. I translated a multi-stage physical procedure into a six-step experience with clear progress, timed states, image capture, and readable results.
+      </p>
+
+      <div class="case-meta-grid">
+        <div class="case-meta-card">
+          <span class="case-meta-label">Role</span>
+          <span class="case-meta-value">Frontend &amp; UX Engineer</span>
+        </div>
+        <div class="case-meta-card">
+          <span class="case-meta-label">Organization</span>
+          <span class="case-meta-value">Garg Group, UIUC</span>
+        </div>
+        <div class="case-meta-card">
+          <span class="case-meta-label">Timeline</span>
+          <span class="case-meta-value">May 2026 – Present</span>
+        </div>
+        <div class="case-meta-card">
+          <span class="case-meta-label">Tools</span>
+          <span class="case-meta-value">Figma, React, Flask, OpenCV</span>
+        </div>
+      </div>
+
+      <section class="case-section">
+        <div class="case-section-header">
+          <span class="case-section-number">01 · Context</span>
+          <h2>The interface had to coordinate people, chemistry, and hardware</h2>
+        </div>
+        <div class="case-copy">
+          <p>
+            The underlying analysis combines sample preparation, reagent confirmation, a timed reaction, camera capture, and computer-vision calculations. The software needed to preserve that order while remaining usable on a phone in a field or laboratory setting.
+          </p>
+          <p>
+            My responsibility was to turn the scientific requirements into a coherent interface, prototype the workflow, and implement the responsive product that connects to the analysis pipeline.
+          </p>
+          <div class="case-callout">
+            <strong>Design challenge:</strong> How might we make every required action and system state visible without asking users to understand the underlying hardware and image-processing architecture?
+          </div>
+        </div>
+      </section>
+
+      <section class="case-section">
+        <div class="case-section-header">
+          <span class="case-section-number">02 · Workflow</span>
+          <h2>One guided sequence instead of a collection of disconnected controls</h2>
+        </div>
+        <div class="case-copy">
+          <p>
+            I mapped the procedure into a stepper that keeps the current action prominent and makes progress visible. The complete flow covers sample identification, preparation checks, the reaction timer, image capture, processing, and results.
+          </p>
+        </div>
+        <div class="case-flow">
+          <div class="case-step">
+            <span class="case-step-number">1</span>
+            <h3>Identify</h3>
+            <p>Enter the sample identifier and establish the record for the test.</p>
+          </div>
+          <div class="case-step">
+            <span class="case-step-number">2</span>
+            <h3>Prepare</h3>
+            <p>Confirm reagents and required setup before the timed portion begins.</p>
+          </div>
+          <div class="case-step">
+            <span class="case-step-number">3</span>
+            <h3>Capture</h3>
+            <p>Complete the 180-second reaction and capture the sample image.</p>
+          </div>
+          <div class="case-step">
+            <span class="case-step-number">4</span>
+            <h3>Interpret</h3>
+            <p>Process the image and present the resulting material concentrations.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="case-section">
+        <div class="case-section-header">
+          <span class="case-section-number">03 · Decisions</span>
+          <h2>Design choices that support a physical, time-sensitive task</h2>
+        </div>
+        <div class="case-grid">
+          <article class="case-decision">
+            <h3>Progressive guidance</h3>
+            <p>The stepper exposes only the information needed for the current stage while preserving an overview of progress.</p>
+          </article>
+          <article class="case-decision">
+            <h3>Visible system status</h3>
+            <p>Timers, camera states, processing feedback, and result gauges communicate what the device is doing.</p>
+          </article>
+          <article class="case-decision">
+            <h3>Reusable visual language</h3>
+            <p>CSS tokens, dark mode, SVG gauges, and microinteractions create consistency across mobile screens.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="case-section">
+        <div class="case-section-header">
+          <span class="case-section-number">04 · Delivery</span>
+          <h2>Prototyping and implementation stayed connected</h2>
+        </div>
+        <div class="case-copy">
+          <p>
+            I implemented the experience as a responsive React PWA and connected it to a Flask service that passes captured images to the Python/OpenCV analysis pipeline. Local storage preserves settings and test history, while the interface provides a software fallback for development when physical hardware is unavailable.
+          </p>
+          <p>
+            The result is a working end-to-end workflow rather than a standalone mockup. Designing and building the interface together allowed interaction details to be evaluated against the real timing, camera, and processing constraints.
+          </p>
+        </div>
+      </section>
+
+      <section class="case-section">
+        <div class="case-section-header">
+          <span class="case-section-number">05 · Validation</span>
+          <h2>What is complete—and what still needs evidence</h2>
+        </div>
+        <div class="case-copy">
+          <p>
+            The six-step PWA and analysis integration are implemented. Formal usability results are not yet included here, so I do not claim improvements in completion rate or testing time.
+          </p>
+          <p>
+            The next validation cycle should measure test completion, time per step, setup errors, recovery from camera failures, and comprehension of the final result. Those observations would inform whether the sequence, labels, and feedback states need further iteration.
+          </p>
+          <div class="case-callout">
+            <strong>Reflection:</strong> Interfaces for physical workflows must make the system's state as legible as the user's next action. The best visual treatment cannot compensate for hidden timing, hardware, or recovery states.
+          </div>
+        </div>
+      </section>
+
+      <div class="case-actions">
+        <a class="btn btn-primary" href="index.html#projects">View More Work</a>
+        <a class="btn btn-outline" href="mailto:connie4@illinois.edu">Contact Me</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© <span id="year"></span> Connie Zhang · Built with care</p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>

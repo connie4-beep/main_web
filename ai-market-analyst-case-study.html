@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="AI Market Analyst product design case study by Connie Zhang: combining interactive market data with contextual, plain-language AI explanations." />
+  <title>AI Market Analyst Case Study | Connie Zhang</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <nav class="navbar scrolled" id="navbar">
+    <div class="navbar-inner">
+      <a href="index.html#hero" class="nav-logo">CZ</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="nav-links">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#experience">Experience</a></li>
+        <li><a href="index.html#projects">Case Studies</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+      <div class="nav-social">
+        <a href="https://github.com/connie4-beep" target="_blank" rel="noopener noreferrer" aria-label="GitHub">GH</a>
+        <a href="https://www.linkedin.com/in/connie-z-51727529a/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">LI</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="case-page">
+    <div class="container">
+      <a class="case-back" href="index.html#projects">← Back to portfolio</a>
+      <span class="case-kicker">AI Product Design · Data Visualization · Working Prototype</span>
+      <h1 class="case-title">Helping non-experts ask better questions about market data</h1>
+      <p class="case-lede">
+        The AI Market Analyst pairs an interactive stock dashboard with a contextual Gemini assistant. Instead of making users interpret charts and headlines alone, the experience lets them explore an asset and ask plain-language follow-up questions about what they see.
+      </p>
+
+      <div class="case-meta-grid">
+        <div class="case-meta-card">
+          <span class="case-meta-label">Role</span>
+          <span class="case-meta-value">Product Designer &amp; Developer</span>
+        </div>
+        <div class="case-meta-card">
+          <span class="case-meta-label">Project Type</span>
+          <span class="case-meta-value">Independent Prototype</span>
+        </div>
+        <div class="case-meta-card">
+          <span class="case-meta-label">Timeline</span>
+          <span class="case-meta-value">Nov 2025 – Mar 2026</span>
+        </div>
+        <div class="case-meta-card">
+          <span class="case-meta-label">Tools</span>
+          <span class="case-meta-value">Gemini, Dash, Plotly, yfinance</span>
+        </div>
+      </div>
+
+      <section class="case-section">
+        <div class="case-section-header">
+          <span class="case-section-number">01 · Hypothesis</span>
+          <h2>Charts show what changed, but not always what it means</h2>
+        </div>
+        <div class="case-copy">
+          <p>
+            Financial dashboards often assume that users already understand candlesticks, time horizons, company context, and the relationship between price movement and recent news. My working hypothesis was that non-expert users would benefit from explanations embedded directly beside the data they were exploring.
+          </p>
+          <p>
+            This is a product hypothesis, not a completed research finding. I built the prototype to make the interaction testable and to identify where AI adds value—or creates new trust problems.
+          </p>
+          <div class="case-callout">
+            <strong>Design question:</strong> How might an AI assistant explain the active market context without replacing the user's judgment or presenting generated text as financial advice?
+          </div>
+        </div>
+      </section>
+
+      <section class="case-section">
+        <div class="case-section-header">
+          <span class="case-section-number">02 · Why AI</span>
+          <h2>Use generation for interpretation, not for the underlying facts</h2>
+        </div>
+        <div class="case-grid">
+          <article class="case-decision">
+            <h3>Contextual explanation</h3>
+            <p>Generated responses can adapt explanations to the selected company and the user's specific question.</p>
+          </article>
+          <article class="case-decision">
+            <h3>Follow-up dialogue</h3>
+            <p>A conversational layer supports questions that fixed dashboard labels and tooltips cannot anticipate.</p>
+          </article>
+          <article class="case-decision">
+            <h3>Grounded inputs</h3>
+            <p>Market data and recent headlines come from external data sources; the model's role is to synthesize that context.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="case-section">
+        <div class="case-section-header">
+          <span class="case-section-number">03 · Interaction</span>
+          <h2>A single loop connects exploration and explanation</h2>
+        </div>
+        <div class="case-flow">
+          <div class="case-step">
+            <span class="case-step-number">1</span>
+            <h3>Select</h3>
+            <p>Choose a sector, company, and time horizon.</p>
+          </div>
+          <div class="case-step">
+            <span class="case-step-number">2</span>
+            <h3>Inspect</h3>
+            <p>Review the candlestick chart, quote, and recent movement.</p>
+          </div>
+          <div class="case-step">
+            <span class="case-step-number">3</span>
+            <h3>Ask</h3>
+            <p>Pose a plain-language question about the active asset.</p>
+          </div>
+          <div class="case-step">
+            <span class="case-step-number">4</span>
+            <h3>Continue</h3>
+            <p>Use the response to ask a more specific follow-up or inspect another timeframe.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="case-section">
+        <div class="case-section-header">
+          <span class="case-section-number">04 · Prompt Design</span>
+          <h2>The model receives the same context the interface is showing</h2>
+        </div>
+        <div class="case-copy">
+          <p>
+            Each request combines four pieces of context: the active ticker, a company summary, recent news headlines, and the user's question. The system instruction asks Gemini to respond concisely, professionally, and in direct relation to that context.
+          </p>
+          <p>
+            Synchronizing the assistant with the selected asset prevents a common interaction failure: asking users to repeat information that is already visible elsewhere in the interface.
+          </p>
+          <h3>Current prompt structure</h3>
+          <ul class="project-list">
+            <li>Identify the active ticker selected in the dashboard</li>
+            <li>Provide a live company summary and recent headline context</li>
+            <li>Include the user's question verbatim</li>
+            <li>Request a concise, contextual answer rather than a generic market overview</li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="case-section">
+        <div class="case-section-header">
+          <span class="case-section-number">05 · Trust</span>
+          <h2>A working prototype also exposes the risks that need design attention</h2>
+        </div>
+        <div class="case-copy">
+          <p>
+            The prototype demonstrates the core experience, but it does not yet solve every trust and safety concern. Generated explanations can be incomplete, overly confident, or based on stale context. A production version should make those limitations visible rather than hiding them behind a polished chat interface.
+          </p>
+        </div>
+        <div class="case-grid">
+          <article class="case-decision">
+            <h3>Source visibility</h3>
+            <p>Show which company information and headlines informed the answer, including timestamps.</p>
+          </article>
+          <article class="case-decision">
+            <h3>Uncertainty language</h3>
+            <p>Distinguish sourced facts from interpretation and avoid implying guaranteed financial outcomes.</p>
+          </article>
+          <article class="case-decision">
+            <h3>Failure recovery</h3>
+            <p>Provide a useful fallback when market data, news, or model generation is unavailable.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="case-section">
+        <div class="case-section-header">
+          <span class="case-section-number">06 · Validation</span>
+          <h2>What is built—and what should be tested next</h2>
+        </div>
+        <div class="case-copy">
+          <p>
+            The dashboard, filtering, charts, data connections, and Gemini interaction are implemented as a working prototype. Formal usability testing has not yet been completed, so I do not claim improvements in comprehension or decision quality.
+          </p>
+          <p>
+            The next study should compare the dashboard with and without contextual AI assistance. I would measure explanation comprehension, confidence calibration, time to answer a market question, follow-up behavior, and whether users can distinguish facts from model interpretation.
+          </p>
+          <div class="case-callout">
+            <strong>Reflection:</strong> Adding AI is not the same as designing an AI experience. The product work is in deciding what context the model receives, how uncertainty is communicated, and where the user remains in control.
+          </div>
+          <div class="case-actions">
+            <a class="btn btn-primary" href="market-tracker.html" target="_blank">Try the Prototype ↗</a>
+            <a class="btn btn-outline" href="https://github.com/connie4-beep/stock_dashboard" target="_blank" rel="noopener noreferrer">View Code ↗</a>
+          </div>
+        </div>
+      </section>
+
+      <div class="case-actions">
+        <a class="btn btn-primary" href="index.html#projects">View More Work</a>
+        <a class="btn btn-outline" href="mailto:connie4@illinois.edu">Contact Me</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <p>© <span id="year"></span> Connie Zhang · Built with care</p>
+  </footer>
+  <script src="script.js"></script>
+</body>
+</html>

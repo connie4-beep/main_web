@@ -22,7 +22,7 @@
       transform: translateX(-50%);
       width: 500px;
       height: 400px;
-      background: radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, transparent 70%);
+      display: none;
       pointer-events: none;
     }
 
@@ -80,9 +80,9 @@
       font-weight: 600;
       padding: 4px 14px;
       border-radius: var(--radius-pill);
-      background: rgba(124, 58, 237, 0.1);
-      color: #a78bfa;
-      border: 1px solid rgba(124, 58, 237, 0.2);
+      background: var(--accent-soft);
+      color: #315447;
+      border: 1px solid #cedbd3;
     }
 
     /* Meta bar */
@@ -156,8 +156,8 @@
     }
 
     .callout-problem {
-      background: rgba(239, 68, 68, 0.08);
-      border-left: 4px solid #ef4444;
+      background: #f0ece4;
+      border-left: 4px solid #8a7154;
     }
 
     .callout-problem p {
@@ -167,8 +167,8 @@
     }
 
     .callout-hypothesis {
-      background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(124, 58, 237, 0.08));
-      border: 1px solid rgba(37, 99, 235, 0.2);
+      background: var(--accent-soft);
+      border: 1px solid #cedbd3;
     }
 
     .callout-hypothesis p:first-child {
@@ -178,8 +178,8 @@
     }
 
     .callout-howto {
-      background: rgba(234, 179, 8, 0.08);
-      border-left: 4px solid #eab308;
+      background: #eef0e9;
+      border-left: 4px solid #68745f;
     }
 
     /* Scenario list */
@@ -212,7 +212,7 @@
     .scenario-dot {
       width: 8px;
       height: 8px;
-      background: #ef4444;
+      background: #8a7154;
       border-radius: 50%;
       flex-shrink: 0;
       margin-top: 8px;
@@ -259,9 +259,9 @@
       line-height: 1.5;
     }
 
-    .check-green { color: #22c55e; flex-shrink: 0; }
-    .cross-red { color: #ef4444; flex-shrink: 0; }
-    .check-blue { color: #60a5fa; flex-shrink: 0; }
+    .check-green { color: #466b5b; flex-shrink: 0; }
+    .cross-red { color: #8a7154; flex-shrink: 0; }
+    .check-blue { color: #526d78; flex-shrink: 0; }
     .dot-muted { color: var(--text-muted); flex-shrink: 0; }
 
     /* Feature sections */
@@ -346,9 +346,9 @@
       margin-bottom: var(--space-xs);
     }
 
-    .metric-card:nth-child(1) .metric-value { color: #22c55e; }
-    .metric-card:nth-child(2) .metric-value { color: #60a5fa; }
-    .metric-card:nth-child(3) .metric-value { color: #a78bfa; }
+    .metric-card:nth-child(1) .metric-value { color: #365f50; }
+    .metric-card:nth-child(2) .metric-value { color: #526d78; }
+    .metric-card:nth-child(3) .metric-value { color: #70654e; }
 
     .metric-label {
       font-weight: 600;
@@ -420,7 +420,7 @@
 
     /* Reflection box */
     .reflection-box {
-      background: linear-gradient(135deg, rgba(255,255,255,0.03), rgba(255,255,255,0.06));
+      background: var(--bg-secondary);
       border: 1px solid var(--border-card);
       border-radius: var(--radius-lg);
       padding: var(--space-xl);
@@ -480,7 +480,7 @@
 
       <div class="case-tags">
         <span class="case-tag">Product Design</span>
-        <span class="case-tag">UX Research</span>
+        <span class="case-tag">Product Analysis</span>
         <span class="case-tag">Case Study</span>
       </div>
 
@@ -508,7 +508,7 @@
       </div>
       <div>
         <div class="case-meta-label">Tools</div>
-        <div class="case-meta-value">Figma, User Research, Data Analysis</div>
+        <div class="case-meta-value">Figma, Scenario Analysis, Product Teardown</div>
       </div>
     </div>
 
@@ -518,7 +518,7 @@
       <h2>The Silent Switch Problem</h2>
 
       <div class="callout callout-problem">
-        <p>Users face anxiety and missed appointments when algorithms silently re-dispatch drivers without clear communication or user consent.</p>
+        <p><strong>Working hypothesis:</strong> Silent driver re-dispatch may increase anxiety and reduce trust when riders have time-sensitive trips.</p>
       </div>
 
       <p>
@@ -528,18 +528,18 @@
       </p>
 
       <div class="scenario-list">
-        <h3>Real User Scenarios</h3>
+        <h3>High-Stakes Scenarios to Investigate</h3>
         <div class="scenario-item">
           <div class="scenario-dot"></div>
-          <p><strong>Airport trips:</strong> Driver shown as "2 min away" suddenly becomes "8 min away" with no explanation, risking flight check-in deadlines.</p>
+          <p><strong>Airport trips:</strong> A driver change that increases the ETA could threaten a fixed check-in deadline.</p>
         </div>
         <div class="scenario-item">
           <div class="scenario-dot"></div>
-          <p><strong>Medical appointments:</strong> Users watching their driver approach only to see them reassigned, causing panic about missing critical appointments.</p>
+          <p><strong>Medical appointments:</strong> Unexplained re-assignment could create uncertainty when arriving on time matters.</p>
         </div>
         <div class="scenario-item">
           <div class="scenario-dot"></div>
-          <p><strong>Business meetings:</strong> Lack of arrival time certainty makes it impossible to plan with confidence.</p>
+          <p><strong>Business meetings:</strong> A less reliable arrival estimate could make planning and communication harder.</p>
         </div>
       </div>
     </section>
@@ -662,31 +662,35 @@
       </div>
     </section>
 
-    <!-- Section 4: Impact -->
+    <!-- Section 4: Validation -->
     <section class="case-section">
-      <div class="case-section-number">04 — Expected Impact</div>
-      <h2>Success Metrics</h2>
+      <div class="case-section-number">04 — Proposed Validation</div>
+      <h2>Success Measures</h2>
+
+      <div class="callout callout-hypothesis">
+        <p><strong>Validation status:</strong> This is a conceptual product teardown. The measures below are proposed evaluation criteria, not observed results.</p>
+      </div>
 
       <div class="metrics-grid">
         <div class="metric-card">
-          <div class="metric-value">↑ 25%</div>
-          <div class="metric-label">User Trust Score</div>
-          <div class="metric-desc">Measured via post-ride NPS and "reliability" rating</div>
+          <div class="metric-value">Trust</div>
+          <div class="metric-label">Reliability Perception</div>
+          <div class="metric-desc">Compare post-ride trust and perceived ETA reliability across variants</div>
         </div>
         <div class="metric-card">
-          <div class="metric-value">↓ 40%</div>
+          <div class="metric-value">Support</div>
           <div class="metric-label">Re-Dispatch Complaints</div>
-          <div class="metric-desc">Support tickets related to driver switching</div>
+          <div class="metric-desc">Track support contacts and cancellation reasons related to driver switching</div>
         </div>
         <div class="metric-card">
-          <div class="metric-value">↑ 15%</div>
-          <div class="metric-label">Premium Tier Adoption</div>
-          <div class="metric-desc">Users upgrading for guaranteed reliability</div>
+          <div class="metric-value">Trade-off</div>
+          <div class="metric-label">Marketplace Effects</div>
+          <div class="metric-desc">Measure changes to wait time, cancellations, driver utilization, and opt-in behavior</div>
         </div>
       </div>
 
       <div class="ab-test-box">
-        <h3>A/B Test Framework</h3>
+        <h3>Proposed A/B Test Framework</h3>
         <div class="ab-row">
           <span class="ab-label">Control:</span>
           <span class="ab-desc">Current silent re-dispatch behavior</span>
