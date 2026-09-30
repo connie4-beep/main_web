@@ -8,24 +8,24 @@
 /* --- CSS Custom Properties --- */
 :root {
   /* Colors */
-  --bg-primary: #f6f5f1;
-  --bg-secondary: #ecebe5;
-  --bg-card: #fdfcf9;
-  --bg-card-hover: #faf9f5;
-  --bg-nav: rgba(246, 245, 241, 0.94);
+  --bg-primary: #f6f7f9;
+  --bg-secondary: #e9eef3;
+  --bg-card: #fdfdfe;
+  --bg-card-hover: #f8fafc;
+  --bg-nav: rgba(246, 247, 249, 0.94);
 
-  --text-primary: #242824;
-  --text-secondary: #555e58;
-  --text-muted: #7b837e;
+  --text-primary: #252b33;
+  --text-secondary: #56616c;
+  --text-muted: #7b8691;
 
-  --accent-violet: #365f50;
-  --accent-blue: #687d73;
-  --accent-gradient: #365f50;
-  --accent-gradient-text: #365f50;
-  --accent-soft: #e3ebe6;
+  --accent-violet: #315a7d;
+  --accent-blue: #6f8ca5;
+  --accent-gradient: #315a7d;
+  --accent-gradient-text: #315a7d;
+  --accent-soft: #e4ebf2;
 
-  --border-subtle: rgba(36, 40, 36, 0.10);
-  --border-card: rgba(36, 40, 36, 0.09);
+  --border-subtle: rgba(37, 43, 51, 0.10);
+  --border-card: rgba(37, 43, 51, 0.09);
   --glow-violet: transparent;
   --glow-blue: transparent;
 
@@ -279,7 +279,7 @@ body {
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid var(--bg-card);
-  box-shadow: 0 10px 28px rgba(36, 40, 36, 0.12);
+  box-shadow: 0 10px 28px rgba(37, 43, 51, 0.12);
   display: block;
 }
 
@@ -346,13 +346,13 @@ body {
 .hero-link.primary {
   background: var(--accent-gradient);
   color: #fff;
-  box-shadow: 0 3px 12px rgba(36, 64, 53, 0.16);
+  box-shadow: 0 3px 12px rgba(49, 90, 125, 0.16);
 }
 
 .hero-link.primary:hover {
   transform: translateY(-2px);
-  background: #2f5246;
-  box-shadow: 0 5px 16px rgba(36, 64, 53, 0.2);
+  background: #284d6b;
+  box-shadow: 0 5px 16px rgba(49, 90, 125, 0.2);
 }
 
 .hero-link.outline {
@@ -480,7 +480,7 @@ body {
 
 .project-card:hover {
   background: var(--bg-card-hover);
-  border-color: rgba(54, 95, 80, 0.24);
+  border-color: rgba(49, 90, 125, 0.24);
   transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(36, 40, 36, 0.07);
 }
@@ -492,7 +492,7 @@ body {
 /* Category accent colors */
 .project-card[data-category="engineering"]::before { background: #68736d; }
 .project-card[data-category="data"]::before { background: #526d78; }
-.project-card[data-category="design"]::before { background: #365f50; }
+.project-card[data-category="design"]::before { background: #315a7d; }
 .project-card[data-category="research"]::before { background: #7b7058; }
 
 .project-category {
@@ -507,7 +507,7 @@ body {
 
 .project-card[data-category="engineering"] .project-category { color: #5e6963; }
 .project-card[data-category="data"] .project-category { color: #496671; }
-.project-card[data-category="design"] .project-category { color: #365f50; }
+.project-card[data-category="design"] .project-category { color: #315a7d; }
 .project-card[data-category="research"] .project-category { color: #70654e; }
 
 .project-card h3,
@@ -577,8 +577,8 @@ body {
   padding: 4px 12px;
   border-radius: var(--radius-pill);
   background: var(--accent-soft);
-  color: #315447;
-  border: 1px solid #cedbd3;
+  color: #2c5476;
+  border: 1px solid #cbd8e3;
   white-space: nowrap;
 }
 
@@ -607,11 +607,11 @@ body {
 .btn-primary {
   background: var(--accent-violet);
   color: #fff;
-  box-shadow: 0 3px 10px rgba(36, 64, 53, 0.14);
+  box-shadow: 0 3px 10px rgba(49, 90, 125, 0.14);
 }
 
 .btn-primary:hover {
-  background: #2f5246;
+  background: #284d6b;
   transform: translateY(-1px);
 }
 
@@ -659,8 +659,8 @@ body {
 }
 
 .details-box pre {
-  background: #252b27;
-  color: #dce7e0;
+  background: #242c35;
+  color: #dae7f2;
   padding: var(--space-md);
   border-radius: var(--radius-sm);
   overflow-x: auto;
@@ -907,7 +907,7 @@ body {
 
 .skill-group:hover {
   background: var(--bg-card-hover);
-  border-color: rgba(54, 95, 80, 0.22);
+  border-color: rgba(49, 90, 125, 0.22);
 }
 
 .skill-group-title {
@@ -939,7 +939,7 @@ body {
 
 .skill-pill:hover {
   background: var(--accent-soft);
-  border-color: #c6d5cc;
+  border-color: #c5d4e1;
   transform: translateY(-2px);
 }
 
@@ -971,13 +971,13 @@ body {
   font-weight: 600;
   font-size: 1rem;
   transition: all var(--transition-fast);
-  box-shadow: 0 3px 12px rgba(36, 64, 53, 0.16);
+  box-shadow: 0 3px 12px rgba(49, 90, 125, 0.16);
 }
 
 .contact-email:hover {
   transform: translateY(-2px);
-  background: #2f5246;
-  box-shadow: 0 5px 16px rgba(36, 64, 53, 0.2);
+  background: #284d6b;
+  box-shadow: 0 5px 16px rgba(49, 90, 125, 0.2);
 }
 
 /* ============================================
@@ -1029,7 +1029,7 @@ body {
     left: -24px;
     right: -24px;
     flex-direction: column;
-    background: rgba(246, 245, 241, 0.97);
+    background: rgba(246, 247, 249, 0.97);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     padding: var(--space-lg);
@@ -1135,7 +1135,7 @@ body {
 
 .experience-role:hover {
   transform: translateY(-4px);
-  border-color: rgba(54, 95, 80, 0.22);
+  border-color: rgba(49, 90, 125, 0.22);
 }
 
 .role-header {
